@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.33711.374
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModBuilder", "ModBuilder\ModBuilder.csproj", "{C5C4F26D-49B0-4B47-8A5D-6C3806744617}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "解决方案项", "解决方案项", "{74AA1B2C-5700-4A47-B833-30503D904B6B}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		..\tModLoader.targets = ..\tModLoader.targets
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShaderBuilder", "ShaderBuilder\ShaderBuilder.csproj", "{A6636D87-BB50-4720-A989-A674A6FF0FB4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C5C4F26D-49B0-4B47-8A5D-6C3806744617}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5C4F26D-49B0-4B47-8A5D-6C3806744617}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5C4F26D-49B0-4B47-8A5D-6C3806744617}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5C4F26D-49B0-4B47-8A5D-6C3806744617}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6636D87-BB50-4720-A989-A674A6FF0FB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6636D87-BB50-4720-A989-A674A6FF0FB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6636D87-BB50-4720-A989-A674A6FF0FB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6636D87-BB50-4720-A989-A674A6FF0FB4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D601B163-665F-4D92-9B78-F6A646E8412F}
+	EndGlobalSection
+EndGlobal

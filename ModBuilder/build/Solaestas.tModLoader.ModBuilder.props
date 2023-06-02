@@ -1,0 +1,40 @@
+﻿<Project>
+	<Import Condition="Exists('../../tModLoader.targets') And $(tMLPath) == ''"
+		Project="../../tModLoader.targets" />
+	<Import Condition="Exists('../../../tModLoader.targets') And $(tMLPath) == ''"
+		Project="../../../tModLoader.targets" />
+	<Import Condition="Exists('../../../../tModLoader.targets') And $(tMLPath) == ''"
+		Project="../../../../tModLoader.targets" />
+
+	<PropertyGroup>
+		<!--消除架构警告-->
+		<ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+		<!--复制包里面的程序集到输出目录-->
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<!--相关路径-->
+		<ModBuilderConfigPath>$(BaseIntermediateOutputPath)BuildConfig.json</ModBuilderConfigPath>
+		<ModBuilderTaskPath>$(MSBuildThisFileDirectory)Solaestas.tModLoader.ModBuilder.dll</ModBuilderTaskPath>
+		<ShaderBuilderDirectory>$(BaseIntermediateOutputPath)</ShaderBuilderDirectory>
+		<!--附加功能开关-->
+		<UseAssetPath>true</UseAssetPath>
+		<UsePublicizer>true</UsePublicizer>
+		<UseMinimalMod>false</UseMinimalMod>
+		<!--附加功能配置-->
+		<ResourceStyle>blacklist</ResourceStyle>
+		<PathStyle>plain</PathStyle>
+		<WhitelistMod></WhitelistMod>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!--阻止tML程序集复制到输出目录-->
+		<Reference Include="$(tMLLibraryPath)/**/*.dll" Private="false" />
+		<Reference Include="$(tMLSteamPath)$(tMLPath)" Private="false" />
+		<!--资源文件-->
+		<EffectFile Include="**/*.fx" />
+		<ImageFile Include="**/*.png" />
+		<ImageFile Remove="icon.png" />
+		<ImageFile Remove="workshop_icon*.png" />
+		<AvailableItemName Include="EffectFile" />
+		<AvailableItemName Include="ImageFile" />
+	</ItemGroup>
+</Project>

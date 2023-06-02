@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2</TargetFramework>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<RootNamespace>Solaestas.tModLoader.ModBuilder</RootNamespace>
+		<AssemblyName>Solaestas.tModLoader.ModBuilder</AssemblyName>
+		<PackageId>Solaestas.tModLoader.ModBuilder</PackageId>
+		<Title>Solaestas's Mod Builder</Title>
+		<Description>为tModLoader模组制作者制作的NuGet包，修改并自动化模组构建流程</Description>
+		<PackageReadmeFile>docs/README.md</PackageReadmeFile>
+		<PackageReleaseNotes>Here we go!</PackageReleaseNotes>
+		<IncludeBuildOutput>false</IncludeBuildOutput>
+		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+	</PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.2.0" PrivateAssets="all" />
+    <PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.18.2" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.6.3" PrivateAssets="all" />
+    <PackageReference Include="NuGet.Build.Tasks.Pack" Version="6.6.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.4" />
+    <PackageReference Include="System.Reflection.MetadataLoadContext" Version="7.0.0" PrivateAssets="all" />
+		<Compile Include="../ShaderBuilder/BuildEventArgsConverter.cs" />
+		<None Include="build/*" Pack="true" PackagePath="/build/" />
+		<None Include="docs/README.md" Pack="true" PackagePath="/docs/" />
+		<None Include="tools/*" Pack="true" PackagePath="/tools/" />
+  </ItemGroup>
+
+	<Target Name="RemoveSystem" BeforeTargets="ILRepack">
+		<ItemGroup>
+			<SystemLibrary Include="$(OutputPath)/System*.dll" />
+			<SystemLibrary Include="$(OutputPath)/Microsoft*.dll" />
+		</ItemGroup>
+		<Delete Files="@(SystemLibrary)" />
+	</Target>
+
+	<Target Name="CopyOutput" AfterTargets="ILRepack">
+		<Copy SourceFiles="$(OutputPath)/$(AssemblyName).dll" DestinationFolder="build/" />
+	</Target>
+
+</Project>

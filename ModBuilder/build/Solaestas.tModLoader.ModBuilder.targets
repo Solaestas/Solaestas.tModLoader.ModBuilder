@@ -1,0 +1,50 @@
+﻿<Project>
+	<UsingTask TaskName="GeneratePath" AssemblyFile="$(ModBuilderTaskPath)" />
+	<UsingTask TaskName="GenerateConfig" AssemblyFile="$(ModBuilderTaskPath)" />
+	<UsingTask TaskName="BuildEffect" AssemblyFile="$(ModBuilderTaskPath)" />
+	<UsingTask TaskName="BuildImage" AssemblyFile="$(ModBuilderTaskPath)" />
+	<UsingTask TaskName="BuildMod" AssemblyFile="$(ModBuilderTaskPath)" />
+	<UsingTask TaskName="EnableMod" AssemblyFile="$(ModBuilderTaskPath)" />
+
+	<Target Name="PrepareMod" BeforeTargets="Build">
+		<Message Text="This is test message" Importance="high" />
+		<GenerateConfig GamePath="$(tMLSteamPath)$(tMLPath)" ConfigPath="$(ModBuilderConfigPath)">
+			<Output TaskParameter="ModDirectory" PropertyName="ModDirectory" />
+		</GenerateConfig>
+	</Target>
+
+	<Target Name="BuildImage" AfterTargets="PrepareMod" Inputs="@(ImageFile)"
+		Outputs="@(ImageFile->'$(OutputPath)Assets\%(RelativeDir)%(Filename).rawimg')">
+		<BuildImage InputFiles="@(ImageFile)" OutputDirectory="$(OutputPath)Assets\" />
+	</Target>
+
+	<Target Name="BuildEffect" AfterTargets="PrepareMod" Inputs="@(EffectFile)"
+		Outputs="@(EffectFile->'$(OutputPath)Assets\%(RelativeDir)%(Filename).xnb')">
+		<BuildEffect BuilderDirectory="$(ShaderBuilderDirectory)" InputFiles="@(EffectFile)"
+			TargetPlatform="Windows" TargetProfile="HiDef" BuildConfiguration="Release"
+			IntermediateDirectory="$(IntermediateOutputPath)Assets\"
+			OutputDirectory="$(OutputPath)Assets\" />
+	</Target>
+
+	<Target Name="PrepareBuildMod" BeforeTargets="BuildMod">
+		<ItemGroup>
+			<!--在此Include可以使模组csproj对ImageFile和EffectFile的修改生效-->
+			<AssetFile
+				Include="@(ImageFile->'$(OutputPath)Assets\%(RelativeDir)%(Filename).rawimg')" />
+			<AssetFile Include="@(EffectFile->'$(OutputPath)Assets\%(RelativeDir)%(Filename).xnb')" />
+		</ItemGroup>
+	</Target>
+
+	<Target Name="BuildMod" AfterTargets="Build" Inputs="@(AssetFile);@(Compile);@(ModFile)"
+		Outputs="$(ModDirectory)$(AssemblyName).tmod">
+		<BuildMod ModSourceDirectory="$(MSBuildProjectDirectory)\" ModName="$(AssemblyName)"
+			OutputDirectory="$(OutputPath)" ModDirectory="$(ModDirectory)"
+			Configuration="$(Configuration)" AssetFiles="@(AssetFile);"
+			ResourceFiles="@(ResourceFile)" ConfigPath="$(ModBuilderConfigPath)" />
+	</Target>
+
+	<Target Name="EnableMod" AfterTargets="Build">
+		<EnableMod BuildingMod="$(AssemblyName)" ConfigPath="$(ModBuilderConfigPath)"
+			MinimalMod="$(UseMinimalMod) == 'true'" WhitelistMod="$(WhitelistMod)" />
+	</Target>
+</Project>
