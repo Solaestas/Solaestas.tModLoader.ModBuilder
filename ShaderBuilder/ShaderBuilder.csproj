@@ -8,6 +8,15 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Publicize Include="Microsoft.Xna.Framework.Content.Pipeline" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+	  <PackageReference Include="Krafs.Publicizer" Version="2.2.1">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
 		<Reference Include="Libraries\*.dll" />
 	</ItemGroup>
 </Project>

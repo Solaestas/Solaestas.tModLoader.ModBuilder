@@ -144,6 +144,7 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 		if (File.Exists(pdbPath))
 		{
 			tmod.AddFile($"{ModName}.pdb", pdbPath);
+			property.EacPath = pdbPath;
 		}
 
 		// Add Info

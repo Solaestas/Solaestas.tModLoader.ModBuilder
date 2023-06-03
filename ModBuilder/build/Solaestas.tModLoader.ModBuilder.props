@@ -45,13 +45,6 @@
 		<Solaestas-ModFile Include="build.txt" />
 		<Solaestas-ModFile Include="description.txt" />
 		<Solaestas-ModFile Include="icon.png" />
-		<AvailableItemName Include="Solaestas-EffectFile" />
-		<AvailableItemName Include="Solaestas-ImageFile" />
-		<AvailableItemName Include="Solaestas-HjsonFile" />
-		<AvailableItemName Include="Solaestas-JsonFile" />
-		<AvailableItemName Include="Solaestas-TextFile" />
-		<AvailableItemName Include="Solaestas-MusicFile" />
-		<AvailableItemName Include="Solaestas-ModFile" />
 	</ItemGroup>
 
 	<ItemGroup Condition="$(Solaestas-UsePublicizer)">

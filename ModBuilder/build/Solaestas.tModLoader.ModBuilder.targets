@@ -10,36 +10,35 @@
 		<Error Text="tModLoader.targets not found" />
 	</Target>
 
-	<Target Name="Solaestas-PrepareBuild" BeforeTargets="Build">
+	<Target Name="Solaestas-PrepareBuild" BeforeTargets="ResolveLockFileReferences">
 		<!--阻止tML程序集复制到输出目录-->
 		<ItemGroup>
-			<Reference Update="$(tMLLibraryPath)/**/*.dll" Private="false" />
-			<Reference Update="$(tMLSteamPath)$(tMLPath)" Private="false" />
+			<Reference Update="$(tMLLibraryPath)/**/*.dll">
+				<Private>false</Private>
+			</Reference>
+			<Reference Update="$(tMLSteamPath)$(tMLPath)">
+				<Private>false</Private>
+			</Reference>
+			<Solaestas-AssetFile
+				Include="@(Solaestas-ImageFile->'$(OutputPath)Assets\%(RelativeDir)%(Filename).rawimg')" />
+			<Solaestas-AssetFile Include="@(Solaestas-EffectFile->'$(OutputPath)Assets\%(RelativeDir)%(Filename).xnb')" />
 		</ItemGroup>
 		<GenerateConfig GamePath="$(tMLSteamPath)$(tMLPath)" ConfigPath="$(Solaestas-ConfigPath)">
 			<Output TaskParameter="ModDirectory" PropertyName="Solaestas-ModDirectory" />
 		</GenerateConfig>
 	</Target>
 
-	<Target Name="Solaestas-BuildImage" AfterTargets="Solaestas-PrepareBuild" Inputs="@(Solaestas-ImageFile)"
+	<Target Name="Solaestas-BuildImage" BeforeTargets="BuildMod" Inputs="@(Solaestas-ImageFile)"
 		Outputs="@(Solaestas-ImageFile->'$(OutputPath)Assets\%(RelativeDir)%(Filename).rawimg')">
 		<BuildImage InputFiles="@(Solaestas-ImageFile)" OutputDirectory="$(OutputPath)Assets\" />
 	</Target>
 
-	<Target Name="Solaestas-BuildEffect" AfterTargets="Solaestas-PrepareBuild" Inputs="@(Solaestas-EffectFile)"
+	<Target Name="Solaestas-BuildEffect" BeforeTargets="BuildMod" Inputs="@(Solaestas-EffectFile)"
 		Outputs="@(Solaestas-EffectFile->'$(OutputPath)Assets\%(RelativeDir)%(Filename).xnb')">
 		<BuildEffect BuilderDirectory="$(Solaestas-ShaderBuilderDirectory)" InputFiles="@(Solaestas-EffectFile)"
 			TargetPlatform="Windows" TargetProfile="HiDef" BuildConfiguration="Release"
 			IntermediateDirectory="$(IntermediateOutputPath)Assets\"
 			OutputDirectory="$(OutputPath)Assets\" />
-	</Target>
-
-	<Target Name="Solaestas-PrepareBuildMod" BeforeTargets="BuildMod">
-		<ItemGroup>
-			<Solaestas-AssetFile
-				Include="@(Solaestas-ImageFile->'$(OutputPath)Assets\%(RelativeDir)%(Filename).rawimg')" />
-			<Solaestas-AssetFile Include="@(Solaestas-EffectFile->'$(OutputPath)Assets\%(RelativeDir)%(Filename).xnb')" />
-		</ItemGroup>
 	</Target>
 
 	<!--覆盖tML编译-->
@@ -66,5 +65,11 @@
 		<GeneratePath AssetFiles="@(Solaestas-EffectFile);@(Solaestas-ImageFile);@(Solaestas-ResourceFile)"
 			ClassName="$(Solaestas-AssetClassName)"
 			Namespace="$(Solaestas-AssetNamespace)" OutputDirectory="$(BaseIntermediateOutputPath)" />
+	</Target>
+
+	<Target Name="Solaestas-CleanAsset" BeforeTargets="Clean">
+		<RemoveDir Directories="$(OutputPath)Assets" />
+		<RemoveDir Directories="$(IntermediateOutputPath)Assets" />
+		<Delete Condition="$(Solaestas-UseAssetPath)" Files="$(BaseIntermediateOutputPath)ModPath.g.cs" />
 	</Target>
 </Project>

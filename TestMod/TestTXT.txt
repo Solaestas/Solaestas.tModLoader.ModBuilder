@@ -1,1 +1,41 @@
-﻿
+﻿严重性	代码	说明	项目	文件	行	禁止显示状态
+错误	MSB4018	“BuildEffect”任务意外失败。
+System.AggregateException: 发生一个或多个错误。 ---> CliWrap.Exceptions.CommandExecutionException: Command execution failed because the underlying process (ShaderBuilder.exe#16412) returned a non-zero exit code (-532462766).
+
+Command:
+C:\Users\28271\.nuget\packages\solaestas.tmodloader.modbuilder\1.0.2\build\../tools/ShaderBuilder.exe TestFX.fx obj\Release\net6.0\Assets\ bin\Release\net6.0\Assets\ Windows HiDef Release
+
+You can suppress this validation by calling `WithValidation(CommandResultValidation.None)` on the command.
+   在 CliWrap.Command.<ExecuteAsync>d__49.MoveNext() 位置 /_/CliWrap/Command.Execution.cs:行号 258
+--- 引发异常的上一位置中堆栈跟踪的末尾 ---
+   在 System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   在 CliWrap.Command.<ExecuteAsync>d__49.MoveNext() 位置 /_/CliWrap/Command.Execution.cs:行号 272
+--- 引发异常的上一位置中堆栈跟踪的末尾 ---
+   在 System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   在 CliWrap.Command.<ExecuteAsync>d__49.MoveNext() 位置 /_/CliWrap/Command.Execution.cs:行号 272
+--- 引发异常的上一位置中堆栈跟踪的末尾 ---
+   在 System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   在 CliWrap.Command.<ExecuteAsync>d__49.MoveNext() 位置 /_/CliWrap/Command.Execution.cs:行号 272
+   --- 内部异常堆栈跟踪的结尾 ---
+   在 System.Threading.Tasks.Task.ThrowIfExceptional(Boolean includeTaskCanceledExceptions)
+   在 System.Threading.Tasks.Task.Wait(Int32 millisecondsTimeout, CancellationToken cancellationToken)
+   在 Solaestas.tModLoader.ModBuilder.BuildEffect.Execute()
+   在 Microsoft.Build.BackEnd.TaskExecutionHost.Microsoft.Build.BackEnd.ITaskExecutionHost.Execute()
+   在 Microsoft.Build.BackEnd.TaskBuilder.<ExecuteInstantiatedTask>d__26.MoveNext()
+---> (内部异常 #0) CliWrap.Exceptions.CommandExecutionException: Command execution failed because the underlying process (ShaderBuilder.exe#16412) returned a non-zero exit code (-532462766).
+
+Command:
+C:\Users\28271\.nuget\packages\solaestas.tmodloader.modbuilder\1.0.2\build\../tools/ShaderBuilder.exe TestFX.fx obj\Release\net6.0\Assets\ bin\Release\net6.0\Assets\ Windows HiDef Release
+
+You can suppress this validation by calling `WithValidation(CommandResultValidation.None)` on the command.
+   在 CliWrap.Command.<ExecuteAsync>d__49.MoveNext() 位置 /_/CliWrap/Command.Execution.cs:行号 258
+--- 引发异常的上一位置中堆栈跟踪的末尾 ---
+   在 System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   在 CliWrap.Command.<ExecuteAsync>d__49.MoveNext() 位置 /_/CliWrap/Command.Execution.cs:行号 272
+--- 引发异常的上一位置中堆栈跟踪的末尾 ---
+   在 System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   在 CliWrap.Command.<ExecuteAsync>d__49.MoveNext() 位置 /_/CliWrap/Command.Execution.cs:行号 272
+--- 引发异常的上一位置中堆栈跟踪的末尾 ---
+   在 System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   在 CliWrap.Command.<ExecuteAsync>d__49.MoveNext() 位置 /_/CliWrap/Command.Execution.cs:行号 272<---
+	TestMod	C:\Users\28271\.nuget\packages\solaestas.tmodloader.modbuilder\1.0.2\build\Solaestas.tModLoader.ModBuilder.targets	31	

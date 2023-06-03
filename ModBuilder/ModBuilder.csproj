@@ -17,10 +17,11 @@
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>tModLoader</PackageTags>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<Version>1.0.1.7</Version>
+		<Version>1.0.1.0</Version>
 	</PropertyGroup>
 
   <ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" PrivateAssets="all"/>
     <PackageReference Include="CliWrap" Version="3.6.3" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.6.3" PrivateAssets="all" ExcludeAssets="runtime" />
     <PackageReference Include="NuGet.Build.Tasks.Pack" Version="6.6.0">
@@ -33,6 +34,10 @@
 		<None Include="build/*" Pack="true" PackagePath="/build/" />
 		<None Include="docs/README.md" Pack="true" PackagePath="/docs/" />
 		<None Include="tools/*" Pack="true" PackagePath="/tools/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="tools\" />
   </ItemGroup>
 
 	<Target Name="CopyOutput" AfterTargets="Build">
