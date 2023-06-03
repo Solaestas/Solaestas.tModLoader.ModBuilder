@@ -5,24 +5,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <AdditionalFiles Remove="TestHjson.hjson" />
-  </ItemGroup>
-  <ItemGroup>
+    <PackageReference Include="Solaestas.tModLoader.ModBuilder" Version="1.0.1.7" />
 		<PackageReference Remove="Newtonsoft.Json" />
-  </ItemGroup>
-  <ItemGroup>
-    <Solaestas-EffectFile Remove="TestFX.fx" />
-  </ItemGroup>
-  <ItemGroup>
-    <Solaestas-HjsonFile Remove="TestHjson.hjson" />
-  </ItemGroup>
-  <ItemGroup>
-    <Solaestas-ImageFile Remove="TestPng.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Solaestas-TextFile Remove="TestTXT.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Solaestas.tModLoader.ModBuilder" Version="1.0.0.20" />
   </ItemGroup>
 </Project>

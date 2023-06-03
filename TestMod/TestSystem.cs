@@ -7,6 +7,6 @@ public class TestSystem : ModSystem
 {
 	public override void OnWorldLoad()
 	{
-		Main.NewText(ModAsset.TestPng);
+		Main.NewText(ModAsset.TestTXTPath);
 	}
 }

@@ -17,10 +17,11 @@
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>tModLoader</PackageTags>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<Version>1.0.0.20</Version>
+		<Version>1.0.1.7</Version>
 	</PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CliWrap" Version="3.6.3" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.6.3" PrivateAssets="all" ExcludeAssets="runtime" />
     <PackageReference Include="NuGet.Build.Tasks.Pack" Version="6.6.0">
       <PrivateAssets>all</PrivateAssets>
@@ -34,9 +35,9 @@
 		<None Include="tools/*" Pack="true" PackagePath="/tools/" />
   </ItemGroup>
 
-	<Target Name="CopyOutput" AfterTargets="Compile">
+	<Target Name="CopyOutput" AfterTargets="Build">
 		<ItemGroup>
-			<Solaestas-CopyFile Include="$(OutputPath)**/*.dll" />
+			<Solaestas-CopyFile Include="$(OutputPath)*.dll" />
 		</ItemGroup>
 		<Copy SourceFiles="@(Solaestas-CopyFile)" DestinationFolder="build/" />
 	</Target>
