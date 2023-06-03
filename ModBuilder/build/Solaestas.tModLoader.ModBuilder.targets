@@ -6,7 +6,7 @@
 	<UsingTask TaskName="BuildMod" AssemblyFile="$(ModBuilderTaskPath)" />
 	<UsingTask TaskName="EnableMod" AssemblyFile="$(ModBuilderTaskPath)" />
 
-	<Target Name="PrepareMod" BeforeTargets="Build">
+	<Target Condition="$(NotMod) != 'true'" Name="PrepareMod" BeforeTargets="Build">
 		<Message Text="This is test message" Importance="high" />
 		<GenerateConfig GamePath="$(tMLSteamPath)$(tMLPath)" ConfigPath="$(ModBuilderConfigPath)">
 			<Output TaskParameter="ModDirectory" PropertyName="ModDirectory" />
@@ -28,14 +28,14 @@
 
 	<Target Name="PrepareBuildMod" BeforeTargets="BuildMod">
 		<ItemGroup>
-			<!--在此Include可以使模组csproj对ImageFile和EffectFile的修改生效-->
 			<AssetFile
 				Include="@(ImageFile->'$(OutputPath)Assets\%(RelativeDir)%(Filename).rawimg')" />
 			<AssetFile Include="@(EffectFile->'$(OutputPath)Assets\%(RelativeDir)%(Filename).xnb')" />
 		</ItemGroup>
 	</Target>
 
-	<Target Name="BuildMod" AfterTargets="Build" Inputs="@(AssetFile);@(Compile);@(ModFile)"
+	<Target Condition="$(NotMod) != 'true'" Name="BuildMod" AfterTargets="Build"
+		Inputs="@(AssetFile);@(Compile);@(ModFile)"
 		Outputs="$(ModDirectory)$(AssemblyName).tmod">
 		<BuildMod ModSourceDirectory="$(MSBuildProjectDirectory)\" ModName="$(AssemblyName)"
 			OutputDirectory="$(OutputPath)" ModDirectory="$(ModDirectory)"
@@ -47,4 +47,12 @@
 		<EnableMod BuildingMod="$(AssemblyName)" ConfigPath="$(ModBuilderConfigPath)"
 			MinimalMod="$(UseMinimalMod) == 'true'" WhitelistMod="$(WhitelistMod)" />
 	</Target>
+
+	<Target Name="GeneratePath" BeforeTargets="BeforeCompile"
+		Condition="'$(UseAssetPath)' != ''">
+		<GeneratePath AssetFiles="@(EffectFile);@(ImageFile);@(ResourceFile)"
+			ClassName="$(AssetClassName)"
+			Namespace="$(AssetNamespace)" OutputDirectory="$(BaseIntermediateOutputPath)" />
+	</Target>
+
 </Project>

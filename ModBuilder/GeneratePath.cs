@@ -1,15 +1,10 @@
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using CommunityToolkit.HighPerformance;
 using CommunityToolkit.HighPerformance.Buffers;
 using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
 using Task = Microsoft.Build.Utilities.Task;
 
-namespace ModTools;
+namespace Solaestas.tModLoader.ModBuilder;
 
 public record class PathField(string Filename, string Identity)
 {
@@ -23,6 +18,7 @@ public record class PathField(string Filename, string Identity)
 		{
 			return;
 		}
+
 		_conflicted = true;
 
 		Directories = new string[Identity.Count(Path.DirectorySeparatorChar)];
@@ -33,6 +29,7 @@ public record class PathField(string Filename, string Identity)
 			{
 				return;
 			}
+
 			Directories[i] = StringPool.Shared.GetOrAdd(str);
 		}
 	}
@@ -83,7 +80,7 @@ public class GeneratePath : Task
 			fields.Add(new PathField(filename, identity));
 		}
 
-		HashSet<string> usedField = new HashSet<string>();
+		var usedField = new HashSet<string>();
 		foreach (var conflict in fields.GroupBy(f => f.Field))
 		{
 			if (conflict.Count() <= 1)
@@ -158,6 +155,7 @@ public class GeneratePath : Task
 				{
 					current.FullQualified(sb);
 				}
+
 				previous = current;
 			}
 			usedField.Clear();
@@ -231,13 +229,17 @@ public class GeneratePath : Task
 		{
 			field = '_' + field;
 		}
+
 		return Regex.Replace(field, @"[ \.\-()]", "_", RegexOptions.Compiled);
 	}
 
-	public string GetFileType(string file) => Path.GetExtension(file) switch
+	public string GetFileType(string file)
 	{
-		".png" => "Texture2D",
-		".fx" => "Effect",
-		_ => null
-	};
+		return Path.GetExtension(file) switch
+		{
+			".png" => "Texture2D",
+			".fx" => "Effect",
+			_ => null
+		};
+	}
 }

@@ -19,10 +19,13 @@
 		<UseAssetPath>true</UseAssetPath>
 		<UsePublicizer>true</UsePublicizer>
 		<UseMinimalMod>false</UseMinimalMod>
+		<NotMod>false</NotMod>
 		<!--附加功能配置-->
 		<ResourceStyle>blacklist</ResourceStyle>
+		<AssetNamespace>$(RootNamespace)</AssetNamespace>
+		<AssetClassName>ModAsset</AssetClassName>
 		<PathStyle>plain</PathStyle>
-		<WhitelistMod></WhitelistMod>
+		<WhitelistMod>HEROsMod;Cheatsheet;DragonLen</WhitelistMod>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -36,5 +39,17 @@
 		<ImageFile Remove="workshop_icon*.png" />
 		<AvailableItemName Include="EffectFile" />
 		<AvailableItemName Include="ImageFile" />
+	</ItemGroup>
+
+	<ItemGroup Condition="$(UsePublicizer) == 'true'">
+		<PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.0"
+			ExcludeAssets="runtime" />
+		<Publicize Include="tModLoader" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(UseAssetPath)' != ''">
+		<!--VS会显示Visible为false的文件的所在文件夹，加一个Link修改显示位置-->
+		<Compile Include="$(BaseIntermediateOutputPath)ModAsset.g.cs" Visible="false" AutoGen="true"
+			Link="%(Filename)%(Extension)" />
 	</ItemGroup>
 </Project>
