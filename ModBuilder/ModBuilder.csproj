@@ -12,6 +12,11 @@
 		<PackageReleaseNotes>Here we go!</PackageReleaseNotes>
 		<IncludeBuildOutput>false</IncludeBuildOutput>
 		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+		<PackageProjectUrl>https://github.com/Solaestas/Solaestas.tModLoader.ModBuilder</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/Solaestas/Solaestas.tModLoader.ModBuilder</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>tModLoader</PackageTags>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 	</PropertyGroup>
 
   <ItemGroup>
