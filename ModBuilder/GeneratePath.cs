@@ -1,6 +1,4 @@
 using System.Text.RegularExpressions;
-using CommunityToolkit.HighPerformance;
-using CommunityToolkit.HighPerformance.Buffers;
 using Microsoft.Build.Framework;
 using Task = Microsoft.Build.Utilities.Task;
 
@@ -21,16 +19,16 @@ public record class PathField(string Filename, string Identity)
 
 		_conflicted = true;
 
-		Directories = new string[Identity.Count(Path.DirectorySeparatorChar)];
+		Directories = new string[Identity.Count(c => c == Path.DirectorySeparatorChar)];
 		int i = -1;
-		foreach (var str in Identity.Tokenize(Path.DirectorySeparatorChar))
+		foreach (var str in Identity.Split(Path.DirectorySeparatorChar))
 		{
 			if (++i >= Directories.Length)
 			{
 				return;
 			}
 
-			Directories[i] = StringPool.Shared.GetOrAdd(str);
+			Directories[i] = str;
 		}
 	}
 
@@ -69,7 +67,7 @@ public class GeneratePath : Task
 		var fields = new List<PathField>();
 		foreach (var file in AssetFiles)
 		{
-			var filename = StringPool.Shared.GetOrAdd(file.GetMetadata("Filename"));
+			var filename = file.GetMetadata("Filename");
 			var identity = file.GetMetadata("Identity");
 			if (int.TryParse(filename, out var num))
 			{

@@ -45,12 +45,9 @@ public class GenerateConfig : Task
 			.First(c => c.AttributeType.Name == nameof(AssemblyInformationalVersionAttribute))
 			.ConstructorArguments[0].Value!;
 
-		GameVersion version = identifier.Contains("stable")
-			? GameVersion.Stable
-			: identifier.Contains("preview")
-			? GameVersion.Preview
-			: identifier.Contains("dev")
-			? GameVersion.Developer
+		GameVersion version = identifier.Contains("dev") ? GameVersion.Developer
+			: identifier.Contains("preview") ? GameVersion.Preview
+			: identifier.Contains("stable") ? GameVersion.Stable
 			: throw new Exception("Unknown game version, not in {stable, preview, dev}");
 
 		ModDirectory = Path.Combine(

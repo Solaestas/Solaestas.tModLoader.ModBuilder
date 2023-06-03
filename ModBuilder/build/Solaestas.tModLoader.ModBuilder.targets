@@ -1,57 +1,70 @@
 ﻿<Project>
-	<UsingTask TaskName="GeneratePath" AssemblyFile="$(Solaestas.TaskPath)" />
-	<UsingTask TaskName="GenerateConfig" AssemblyFile="$(Solaestas.TaskPath)" />
-	<UsingTask TaskName="BuildEffect" AssemblyFile="$(Solaestas.TaskPath)" />
-	<UsingTask TaskName="BuildImage" AssemblyFile="$(Solaestas.TaskPath)" />
-	<UsingTask TaskName="BuildMod" AssemblyFile="$(Solaestas.TaskPath)" />
-	<UsingTask TaskName="EnableMod" AssemblyFile="$(Solaestas.TaskPath)" />
+	<UsingTask TaskName="GeneratePath" AssemblyFile="$(Solaestas-TaskPath)" />
+	<UsingTask TaskName="GenerateConfig" AssemblyFile="$(Solaestas-TaskPath)" />
+	<UsingTask TaskName="BuildEffect" AssemblyFile="$(Solaestas-TaskPath)" />
+	<UsingTask TaskName="BuildImage" AssemblyFile="$(Solaestas-TaskPath)" />
+	<UsingTask TaskName="BuildMod" AssemblyFile="$(Solaestas-TaskPath)" />
+	<UsingTask TaskName="EnableMod" AssemblyFile="$(Solaestas-TaskPath)" />
 
-	<Target Condition="$(Solaestas.NotMod) != 'true'" Name="Solaestas.PrepareBuild" BeforeTargets="Build">
-		<GenerateConfig GamePath="$(tMLSteamPath)$(tMLPath)" ConfigPath="$(Solaestas.ConfigPath)">
-			<Output TaskParameter="ModDirectory" PropertyName="Solaestas.ModDirectory" />
+	<Target Name="Solaestas-Test" Condition="'$(tMLPath)' == ''" BeforeTargets="Build">
+		<Error Text="tModLoader.targets not found" />
+	</Target>
+
+	<Target Name="Solaestas-PrepareBuild" BeforeTargets="Build">
+		<!--阻止tML程序集复制到输出目录-->
+		<ItemGroup>
+			<Reference Update="$(tMLLibraryPath)/**/*.dll" Private="false" />
+			<Reference Update="$(tMLSteamPath)$(tMLPath)" Private="false" />
+		</ItemGroup>
+		<GenerateConfig GamePath="$(tMLSteamPath)$(tMLPath)" ConfigPath="$(Solaestas-ConfigPath)">
+			<Output TaskParameter="ModDirectory" PropertyName="Solaestas-ModDirectory" />
 		</GenerateConfig>
 	</Target>
 
-	<Target Name="Solaestas.BuildImage" AfterTargets="Solaestas.PrepareBuild" Inputs="@(Solaestas.ImageFile)"
-		Outputs="@(Solaestas.ImageFile->'$(OutputPath)Assets\%(RelativeDir)%(Filename).rawimg')">
-		<BuildImage InputFiles="@(Solaestas.ImageFile)" OutputDirectory="$(OutputPath)Assets\" />
+	<Target Name="Solaestas-BuildImage" AfterTargets="Solaestas-PrepareBuild" Inputs="@(Solaestas-ImageFile)"
+		Outputs="@(Solaestas-ImageFile->'$(OutputPath)Assets\%(RelativeDir)%(Filename).rawimg')">
+		<BuildImage InputFiles="@(Solaestas-ImageFile)" OutputDirectory="$(OutputPath)Assets\" />
 	</Target>
 
-	<Target Name="Solaestas.BuildEffect" AfterTargets="Solaestas.PrepareBuild" Inputs="@(Solaestas.EffectFile)"
-		Outputs="@(Solaestas.EffectFile->'$(OutputPath)Assets\%(RelativeDir)%(Filename).xnb')">
-		<BuildEffect BuilderDirectory="$(Solaestas.ShaderBuilderDirectory)" InputFiles="@(Solaestas.EffectFile)"
+	<Target Name="Solaestas-BuildEffect" AfterTargets="Solaestas-PrepareBuild" Inputs="@(Solaestas-EffectFile)"
+		Outputs="@(Solaestas-EffectFile->'$(OutputPath)Assets\%(RelativeDir)%(Filename).xnb')">
+		<BuildEffect BuilderDirectory="$(Solaestas-ShaderBuilderDirectory)" InputFiles="@(Solaestas-EffectFile)"
 			TargetPlatform="Windows" TargetProfile="HiDef" BuildConfiguration="Release"
 			IntermediateDirectory="$(IntermediateOutputPath)Assets\"
 			OutputDirectory="$(OutputPath)Assets\" />
 	</Target>
 
-	<Target Name="Solaestas.PrepareBuildMod" BeforeTargets="Solaestas.BuildMod">
+	<Target Name="Solaestas-PrepareBuildMod" BeforeTargets="BuildMod">
 		<ItemGroup>
-			<Solaestas.AssetFile
-				Include="@(Solaestas.ImageFile->'$(OutputPath)Assets\%(RelativeDir)%(Filename).rawimg')" />
-			<Solaestas.AssetFile Include="@(Solaestas.EffectFile->'$(OutputPath)Assets\%(RelativeDir)%(Filename).xnb')" />
+			<Solaestas-AssetFile
+				Include="@(Solaestas-ImageFile->'$(OutputPath)Assets\%(RelativeDir)%(Filename).rawimg')" />
+			<Solaestas-AssetFile Include="@(Solaestas-EffectFile->'$(OutputPath)Assets\%(RelativeDir)%(Filename).xnb')" />
 		</ItemGroup>
 	</Target>
 
-	<Target Condition="$(Solaestas.NotMod) != 'true'" Name="Solaestas.BuildMod" AfterTargets="Build"
-		Inputs="@(Solaestas.AssetFile);@(Compile);@(Solaestas.ResourceFile);@(Solaestas.ModFile)"
-		Outputs="$(Solaestas.ModDirectory)$(AssemblyName).tmod">
-		<BuildMod ModSourceDirectory="$(MSBuildProjectDirectory)\" ModName="$(AssemblyName)"
-			OutputDirectory="$(OutputPath)" ModDirectory="$(Solaestas.ModDirectory)"
-			Configuration="$(Solaestas.Configuration)" AssetFiles="@(Solaestas.AssetFile);"
-			ResourceFiles="@(Solaestas.ResourceFile)" ConfigPath="$(Solaestas.ConfigPath)" />
+	<!--覆盖tML编译-->
+	<Target Condition="$(Solaestas-NotMod) != true" Name="BuildMod" AfterTargets="Build"
+		Inputs="@(Solaestas-AssetFile);@(Compile);@(Solaestas-ResourceFile);@(Solaestas-ModFile)"
+		Outputs="$(Solaestas-ModDirectory)$(AssemblyName).tmod">
+		<BuildMod ModSourceDirectory="$(MSBuildProjectDirectory)" ModName="$(AssemblyName)"
+			OutputDirectory="$(OutputPath)" ModDirectory="$(Solaestas-ModDirectory)"
+			Configuration="$(Solaestas-Configuration)" AssetFiles="@(Solaestas-AssetFile);"
+			ResourceFiles="@(Solaestas-ResourceFile)" ConfigPath="$(Solaestas-ConfigPath)" />
 	</Target>
 
-	<Target Name="Solaestas.EnableMod" AfterTargets="Build">
-		<EnableMod BuildingMod="$(AssemblyName)" ConfigPath="$(Solaestas.ConfigPath)"
-			MinimalMod="$(Solaestas.UseMinimalMod) == 'true'" WhitelistMod="$(Solaestas.WhitelistMod)" />
+	<Target Name="Solaestas-EnableMod" AfterTargets="Build">
+		<EnableMod BuildingMod="$(AssemblyName)" ConfigPath="$(Solaestas-ConfigPath)"
+			MinimalMod="$(Solaestas-UseMinimalMod)" WhitelistMod="$(Solaestas-WhitelistMod)" />
 	</Target>
 
-	<Target Name="Solaestas.GeneratePath" BeforeTargets="BeforeCompile"
-		Condition="'$(Solaestas.UseAssetPath)' != ''">
-		<GeneratePath AssetFiles="@(Solaestas.EffectFile);@(Solaestas.ImageFile);@(Solaestas.ResourceFile)"
-			ClassName="$(Solaestas.AssetClassName)"
-			Namespace="$(Solaestas.AssetNamespace)" OutputDirectory="$(BaseIntermediateOutputPath)" />
+	<Target Name="Solaestas-GeneratePath" BeforeTargets="BeforeCompile"
+		Condition="$(Solaestas-UseAssetPath)">
+		<PropertyGroup>
+			<Solaestas-AssetNamespace Condition="'$(Solaestas-AssetNamespace)' == ''">$(RootNamespace)</Solaestas-AssetNamespace>
+			<Solaestas-AssetClassName Condition="'$(Solaestas-AssetClassName)' == ''">ModAsset</Solaestas-AssetClassName>
+		</PropertyGroup>
+		<GeneratePath AssetFiles="@(Solaestas-EffectFile);@(Solaestas-ImageFile);@(Solaestas-ResourceFile)"
+			ClassName="$(Solaestas-AssetClassName)"
+			Namespace="$(Solaestas-AssetNamespace)" OutputDirectory="$(BaseIntermediateOutputPath)" />
 	</Target>
-
 </Project>

@@ -16,15 +16,12 @@
 		<RepositoryUrl>https://github.com/Solaestas/Solaestas.tModLoader.ModBuilder</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>tModLoader</PackageTags>
-		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<Version>1.0.0.1</Version>
+		<Version>1.0.0.12</Version>
 	</PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.2.0" PrivateAssets="all" />
-    <PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.18.2" />
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.6.3" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.6.3" PrivateAssets="all" ExcludeAssets="runtime" />
     <PackageReference Include="NuGet.Build.Tasks.Pack" Version="6.6.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -37,16 +34,18 @@
 		<None Include="tools/*" Pack="true" PackagePath="/tools/" />
   </ItemGroup>
 
-	<Target Name="RemoveSystem" BeforeTargets="ILRepack">
+	<Target Name="CopyOutput" AfterTargets="Compile">
 		<ItemGroup>
-			<SystemLibrary Include="$(OutputPath)/System*.dll" />
-			<SystemLibrary Include="$(OutputPath)/Microsoft*.dll" />
+			<Solaestas-CopyFile Include="$(OutputPath)**/*.dll" />
 		</ItemGroup>
-		<Delete Files="@(SystemLibrary)" />
+		<Copy SourceFiles="@(Solaestas-CopyFile)" DestinationFolder="build/" />
 	</Target>
 
-	<Target Name="CopyOutput" AfterTargets="ILRepack">
-		<Copy SourceFiles="$(OutputPath)/$(AssemblyName).dll" DestinationFolder="build/" />
+	<Target Name="CleanCopy" BeforeTargets="Clean">
+		<ItemGroup>
+			<Solaestas-CleanFile Include="build/*.dll" />
+		</ItemGroup>
+		<Delete Files="@(Solaestas-CleanFile)" />
 	</Target>
 
 </Project>
