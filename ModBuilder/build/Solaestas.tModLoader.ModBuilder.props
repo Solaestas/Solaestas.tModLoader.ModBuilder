@@ -26,13 +26,13 @@
 
 	<ItemGroup>
 		<!--资源文件-->
-		<Solaestas-EffectFile Include="**/*.fx" />
-		<Solaestas-ImageFile Include="**/*.png" />
+		<Solaestas-EffectFile Include="**/*.fx" Exclude="bin/**/*;obj/**/*" />
+		<Solaestas-ImageFile Include="**/*.png" Exclude="bin/**/*;obj/**/*" />
 		<Solaestas-ImageFile Remove="icon.png" />
 		<Solaestas-ImageFile Remove="workshop_icon*.png" />
-		<Solaestas-HjsonFile Include="**/*.hjson" />
-		<Solaestas-JsonFile Include="**/*.json" />
-		<Solaestas-TextFile Include="**/*.txt" />
+		<Solaestas-HjsonFile Include="**/*.hjson" Exclude="bin/**/*;obj/**/*" />
+		<Solaestas-JsonFile Include="**/*.json" Exclude="bin/**/*;obj/**/*" />
+		<Solaestas-TextFile Include="**/*.txt" Exclude="bin/**/*;obj/**/*" />
 		<Solaestas-TextFile Remove="build.txt" />
 		<Solaestas-TextFile Remove="description.txt" />
 		<Solaestas-MusicFile Include="**/*.ogg" />
