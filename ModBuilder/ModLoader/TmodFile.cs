@@ -68,7 +68,7 @@ public class TmodFile : IEnumerable<TmodFile.FileEntry>
 		Version = version;
 	}
 
-	public KeyValuePair<string, FileEntry> AddFile(string fileName, string filePath)
+	public void AddFile(string fileName, string filePath)
 	{
 		fileName = Sanitize(fileName);
 		var fileInfo = new FileInfo(filePath);
@@ -76,20 +76,14 @@ public class TmodFile : IEnumerable<TmodFile.FileEntry>
 		using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
 		var data = new byte[size];
 		stream.Read(data, 0, size);
-		return new KeyValuePair<string, FileEntry>(fileName, new FileEntry(fileName, -1, size, size, data));
+		files[fileName] = new FileEntry(fileName, -1, size, size, data);
 	}
 
-	public KeyValuePair<string, FileEntry> AddFile(string fileName, byte[] data)
+	public void AddFile(string fileName, byte[] data)
 	{
 		fileName = Sanitize(fileName);
 		int size = data.Length;
-		return new KeyValuePair<string, FileEntry>(fileName, new FileEntry(fileName, -1, size, size, data));
-	}
-
-	public void RemoveFile(string fileName)
-	{
-		files.Remove(Sanitize(fileName));
-		fileTable = null;
+		files[fileName] = new FileEntry(fileName, -1, size, size, data);
 	}
 
 	public int Count => fileTable.Length;

@@ -1,14 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using Microsoft.Build.Framework;
 using Newtonsoft.Json;
 using Solaestas.tModLoader.ModBuilder.ModLoader;
 
 namespace Solaestas.tModLoader.ModBuilder;
+
+public enum ResourceStyle
+{
+	Blacklist,
+
+	Whitelist,
+}
 
 public class BuildMod : Microsoft.Build.Utilities.Task
 {
@@ -16,49 +18,49 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 	/// 模组源码文件夹
 	/// </summary>
 	[Required]
-	public required string ModSourceDirectory { get; set; }
+	public string ModSourceDirectory { get; set; }
 
 	/// <summary>
 	/// 项目输出文件夹
 	/// </summary>
 	[Required]
-	public required string OutputDirectory { get; set; }
+	public string OutputDirectory { get; set; }
 
 	/// <summary>
 	/// 模组文件夹文件夹
 	/// </summary>
 	[Required]
-	public required string ModDirectory { get; set; }
+	public string ModDirectory { get; set; }
 
 	/// <summary>
-	/// 模组名，默认为文件夹名 <br/> 模组名应该与ILoadable的命名空间和程序集名称相同
+	/// 模组名，默认为文件夹名 <br /> 模组名应该与ILoadable的命名空间和程序集名称相同
 	/// </summary>
-	public required string ModName { get; set; }
+	public string ModName { get; set; }
 
 	/// <summary>
 	/// Debug or Release, 决定是否包含PDB
 	/// </summary>
-	public required string Configuration { get; set; }
+	public string Configuration { get; set; }
 
 	/// <summary>
 	/// 无预处理的资源文件，直接从源码中复制
 	/// </summary>
 	[Required]
-	public required ITaskItem[] ResourceFiles { get; set; }
+	public ITaskItem[] ResourceFiles { get; set; }
 
 	/// <summary>
 	/// 需要经过预处理的特殊资源文件
 	/// </summary>
 	[Required]
-	public required ITaskItem[] AssetFiles { get; set; }
+	public ITaskItem[] AssetFiles { get; set; }
 
 	/// <summary>
 	/// 是否使用BuildIgnore来决定是否包含资源
 	/// </summary>
-	public bool IgnoreBuildFile { get; set; }
+	public ResourceStyle ResourceStyle { get; set; }
 
 	[Required]
-	public required string ConfigPath { get; set; }
+	public string ConfigPath { get; set; }
 
 	public override bool Execute()
 	{
@@ -72,76 +74,86 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 		var tmod = new TmodFile(Path.Combine(ModDirectory, $"{ModName}.tmod"), ModName, property.Version);
 
 		var assetDirectory = Path.Combine(OutputDirectory, "Assets") + Path.DirectorySeparatorChar;
+		var prefixLength = assetDirectory.Length + 1;
 
 		// Add dll and pdb
-		var set = new HashSet<string>(property.DllReferences);
+		var dllref = new HashSet<string>(property.DllReferences);
 		var modref = new HashSet<string>(property.ModReferences.Select(mod => mod.Mod));
-		IEnumerable<KeyValuePair<string, TmodFile.FileEntry>> CreateInfo()
+
+		tmod.files = new Dictionary<string, TmodFile.FileEntry>();
+
+		// Add Assets
+		foreach (var file in AssetFiles)
 		{
-			property.DllReferences = set.ToArray();
-			yield return tmod.AddFile("Info", property.ToBytes());
+			var identity = file.ItemSpec[prefixLength..];
+			tmod.AddFile(identity, file.ItemSpec);
 		}
-		tmod.files =
-			AssetFiles.Select(file => tmod.AddFile(file.ItemSpec.Replace(assetDirectory, string.Empty), file.ItemSpec))
-			.Concat(IgnoreBuildFile ?
-			ResourceFiles.Select(file => tmod.AddFile(file.GetMetadata("ModPath"), file.ItemSpec)) :
-			Directory.GetFiles(ModSourceDirectory, "*", SearchOption.AllDirectories)
-			.Select(s => (Identity: s.Replace(ModSourceDirectory, string.Empty), FullPath: s))
-			.Where(s => !property.IgnoreFile(s.Identity) && !IgnoreFile(s.Identity))
-			.Select(file => tmod.AddFile(file.Identity, file.FullPath))).Concat(
-			Directory.GetFiles(OutputDirectory, "*", SearchOption.TopDirectoryOnly)
-			.Where(s => !modref.Contains(Path.GetFileNameWithoutExtension(s)))
-			.Select(file =>
+
+		// Add Resources
+		if (ResourceStyle == ResourceStyle.Blacklist)
+		{
+			var files = Directory.EnumerateFiles(ModSourceDirectory, "*", SearchOption.AllDirectories);
+			foreach (var file in files)
 			{
-				var ext = Path.GetExtension(file);
-				var name = Path.GetFileNameWithoutExtension(file);
-
-				if (name == ModName)
+				var identity = file[prefixLength..];
+				if (!property.IgnoreFile(identity) && !IgnoreFile(identity))
 				{
-					if (ext is ".dll")
-					{
-						return tmod.AddFile(name + ext, file);
-					}
-					else if (ext is ".pdb")
-					{
-						property.EacPath = file;
-						return tmod.AddFile(name + ext, file);
-					}
+					tmod.AddFile(identity, file);
 				}
+			}
+		}
+		else if (ResourceStyle == ResourceStyle.Whitelist)
+		{
+			foreach (var file in ResourceFiles)
+			{
+				var identity = file.GetMetadata("Identity");
+				tmod.AddFile(identity, file.ItemSpec);
+			}
+		}
+		else
+		{
+			throw new Exception("Unknown resource style");
+		}
 
-				if (ext == ".dll")
-				{
-					if (!set.Contains(name))
-					{
-						set.Add(name);
-					}
+		// Add dll
+		foreach (var file in Directory.EnumerateFiles(OutputDirectory, "*.dll", SearchOption.TopDirectoryOnly))
+		{
+			var name = Path.GetFileNameWithoutExtension(file);
 
-					return tmod.AddFile($"lib/{name}.dll", file);
-				}
+			if (name == ModName)
+			{
+				tmod.AddFile($"{name}.dll", file);
+				continue;
+			}
 
-				return default;
-			}).Where(v => v.Key != default))
-			.Concat(CreateInfo())
-			.Distinct(new CCC())
-			.ToImmutableDictionary(v => v.Key, v => v.Value);
+			if (modref.Contains(name))
+			{
+				continue;
+			}
+
+			if (!dllref.Contains(name))
+			{
+				dllref.Add(name);
+			}
+
+			tmod.AddFile($"lib/{name}.dll", file);
+		}
+
+		// Add pdb
+		var pdbPath = Path.Combine(OutputDirectory, $"{ModName}.pdb");
+		if (File.Exists(pdbPath))
+		{
+			tmod.AddFile($"{ModName}.pdb", pdbPath);
+		}
+
+		// Add Info
+		property.DllReferences = dllref.ToArray();
+		tmod.AddFile("Info", property.ToBytes());
 
 		tmod.Save(info);
 		Log.LogMessage(MessageImportance.High, $"Building Success, costs {sw.Elapsed}");
 
 		return true;
-	}
-
-	public class CCC : EqualityComparer<KeyValuePair<string, TmodFile.FileEntry>>
-	{
-		public override bool Equals(KeyValuePair<string, TmodFile.FileEntry> x, KeyValuePair<string, TmodFile.FileEntry> y)
-		{
-			return x.Key == y.Key;
-		}
-
-		public override int GetHashCode(KeyValuePair<string, TmodFile.FileEntry> obj)
-		{
-			return obj.Key.GetHashCode();
-		}
 	}
 
 	public bool IgnoreFile(string path)
@@ -153,8 +165,23 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 			return true;
 		}
 
-		return path[0] == '.' || path.StartsWith("bin", StringComparison.Ordinal) || path.StartsWith("obj", StringComparison.Ordinal) || path.StartsWith("Properties", StringComparison.Ordinal)
-			? true
-			: path == "icon.png" ? false : ext is ".png" or ".cs" or ".md" or ".txt" or ".cache" or ".fx";
+		if (path.StartsWith("bin", StringComparison.Ordinal)
+			|| path.StartsWith("obj", StringComparison.Ordinal)
+			|| path.StartsWith("Properties", StringComparison.Ordinal))
+		{
+			return true;
+		}
+
+		if (path is "icon.png" or "build.txt" or "description.txt")
+		{
+			return true;
+		}
+
+		if (ext is ".png" or ".cs" or ".md" or ".cache" or ".fx")
+		{
+			return true;
+		}
+
+		return false;
 	}
 }
