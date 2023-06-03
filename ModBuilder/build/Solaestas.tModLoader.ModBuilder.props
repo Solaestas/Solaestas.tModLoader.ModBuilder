@@ -12,42 +12,63 @@
 		<!--复制包里面的程序集到输出目录-->
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<!--相关路径-->
-		<ModBuilderConfigPath>$(BaseIntermediateOutputPath)BuildConfig.json</ModBuilderConfigPath>
-		<ModBuilderTaskPath>$(MSBuildThisFileDirectory)Solaestas.tModLoader.ModBuilder.dll</ModBuilderTaskPath>
-		<ShaderBuilderDirectory>$(BaseIntermediateOutputPath)</ShaderBuilderDirectory>
+		<Solaestas.ConfigPath>$(BaseIntermediateOutputPath)BuildConfig.json</Solaestas.ConfigPath>
+		<Solaestas.TaskPath>$(MSBuildThisFileDirectory)Solaestas.tModLoader.ModBuilder.dll</Solaestas.TaskPath>
+		<Solaestas.ShaderBuilderDirectory>$(MSBuildThisFileDirectory)../tools/</Solaestas.ShaderBuilderDirectory>
 		<!--附加功能开关-->
-		<UseAssetPath>true</UseAssetPath>
-		<UsePublicizer>true</UsePublicizer>
-		<UseMinimalMod>false</UseMinimalMod>
-		<NotMod>false</NotMod>
+		<Solaestas.UseAssetPath>true</Solaestas.UseAssetPath>
+		<Solaestas.UsePublicizer>true</Solaestas.UsePublicizer>
+		<Solaestas.UseMinimalMod>false</Solaestas.UseMinimalMod>
+		<Solaestas.NotMod>false</Solaestas.NotMod>
 		<!--附加功能配置-->
-		<ResourceStyle>blacklist</ResourceStyle>
-		<AssetNamespace>$(RootNamespace)</AssetNamespace>
-		<AssetClassName>ModAsset</AssetClassName>
-		<PathStyle>plain</PathStyle>
-		<WhitelistMod>HEROsMod;Cheatsheet;DragonLen</WhitelistMod>
-	</PropertyGroup>
+		<Solaestas.ResourceStyle>blacklist</Solaestas.ResourceStyle>
+		<Solaestas.AssetNamespace>$(RootNamespace)</Solaestas.AssetNamespace>
+		<Solaestas.AssetClassName>ModAsset</Solaestas.AssetClassName>
+		<Solaestas.PathStyle>plain</Solaestas.PathStyle>
+		<Solaestas.WhitelistMod>HEROsMod;Cheatsheet;DragonLen</Solaestas.WhitelistMod>
+	
+</PropertyGroup>
 
 	<ItemGroup>
 		<!--阻止tML程序集复制到输出目录-->
 		<Reference Include="$(tMLLibraryPath)/**/*.dll" Private="false" />
 		<Reference Include="$(tMLSteamPath)$(tMLPath)" Private="false" />
 		<!--资源文件-->
-		<EffectFile Include="**/*.fx" />
-		<ImageFile Include="**/*.png" />
-		<ImageFile Remove="icon.png" />
-		<ImageFile Remove="workshop_icon*.png" />
-		<AvailableItemName Include="EffectFile" />
-		<AvailableItemName Include="ImageFile" />
+		<Solaestas.EffectFile Include="**/*.fx" />
+		<Solaestas.ImageFile Include="**/*.png" />
+		<Solaestas.ImageFile Remove="icon.png" />
+		<Solaestas.ImageFile Remove="workshop_icon*.png" />
+		<Solaestas.HjsonFile Include="**/*.hjson" />
+		<Solaestas.JsonFile Include="**/*.json" />
+		<Solaestas.TextFile Include="**/*.txt" />
+		<Solaestas.TextFile Remove="build.txt" />
+		<Solaestas.TextFile Remove="description.txt" />
+		<Solaestas.MusicFile Include="**/*.ogg" />
+		<Solaestas.MusicFile Include="**/*.wav" />
+		<Solaestas.MusicFile Include="**/*.mp3" />
+		<Solaestas.ResourceFile Include="@(Solaestas.HjsonFile)" />
+		<Solaestas.ResourceFile Include="@(Solaestas.JsonFile)" />
+		<Solaestas.ResourceFile Include="@(Solaestas.TextFile)" />
+		<Solaestas.ResourceFile Include="@(Solaestas.MusicFile)" />
+		<Solaestas.ModFile Include="build.txt" />
+		<Solaestas.ModFile Include="description.txt" />
+		<Solaestas.ModFile Include="icon.png" />
+		<AvailableItemName Include="Solaestas.EffectFile" />
+		<AvailableItemName Include="Solaestas.ImageFile" />
+		<AvailableItemName Include="Solaestas.HjsonFile" />
+		<AvailableItemName Include="Solaestas.JsonFile" />
+		<AvailableItemName Include="Solaestas.TextFile" />
+		<AvailableItemName Include="Solaestas.MusicFile" />
+		<AvailableItemName Include="Solaestas.ModFile" />
 	</ItemGroup>
 
-	<ItemGroup Condition="$(UsePublicizer) == 'true'">
+	<ItemGroup Condition="$(Solaestas.UsePublicizer) == 'true'">
 		<PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.0"
 			ExcludeAssets="runtime" />
 		<Publicize Include="tModLoader" />
 	</ItemGroup>
 
-	<ItemGroup Condition="'$(UseAssetPath)' != ''">
+	<ItemGroup Condition="'$(Solaestas.UseAssetPath)' != ''">
 		<!--VS会显示Visible为false的文件的所在文件夹，加一个Link修改显示位置-->
 		<Compile Include="$(BaseIntermediateOutputPath)ModAsset.g.cs" Visible="false" AutoGen="true"
 			Link="%(Filename)%(Extension)" />

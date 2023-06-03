@@ -18,6 +18,7 @@
 		<PackageTags>tModLoader</PackageTags>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<Version>1.0.0.1</Version>
 	</PropertyGroup>
 
   <ItemGroup>

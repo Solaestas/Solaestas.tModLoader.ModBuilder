@@ -49,7 +49,7 @@ public class BuildEffect : Task
 	{
 		bool success = true;
 		Log.LogMessage(MessageImportance.High, "Building Effects...");
-		var filename = $"{BuilderDirectory}ContentBuilder.exe";
+		var filename = $"{BuilderDirectory}ShaderBuilder.exe";
 		var args = new List<string>()
 		{
 			InputFiles,
@@ -67,6 +67,7 @@ public class BuildEffect : Task
 				FileName = filename,
 				Arguments = string.Join(" ", args),
 				RedirectStandardOutput = true,
+				CreateNoWindow = true,
 			},
 		};
 
