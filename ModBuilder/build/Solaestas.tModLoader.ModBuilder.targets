@@ -48,7 +48,8 @@
 		<BuildMod ModSourceDirectory="$(MSBuildProjectDirectory)" ModName="$(AssemblyName)"
 			OutputDirectory="$(OutputPath)" ModDirectory="$(Solaestas-ModDirectory)"
 			Configuration="$(Solaestas-Configuration)" AssetFiles="@(Solaestas-AssetFile);"
-			ResourceFiles="@(Solaestas-ResourceFile)" ConfigPath="$(Solaestas-ConfigPath)" />
+			ResourceFiles="@(Solaestas-ResourceFile)" ConfigPath="$(Solaestas-ConfigPath)" 
+			ResourceStyle="$(Solaestas-ResourceStyle)"/>
 	</Target>
 
 	<Target Name="Solaestas-EnableMod" AfterTargets="Build">

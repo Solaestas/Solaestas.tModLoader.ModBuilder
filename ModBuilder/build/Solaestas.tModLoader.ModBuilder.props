@@ -22,9 +22,10 @@
 		<Solaestas-NotMod>false</Solaestas-NotMod>
 		<!--附加功能配置-->
 		<Solaestas-WhitelistMod>HEROsMod;Cheatsheet;DragonLen</Solaestas-WhitelistMod>
+		<Solaestas-ResourceStyle>Blacklist</Solaestas-ResourceStyle>
 	</PropertyGroup>
 
-	<ItemGroup>
+	<ItemGroup Condition="$(Solaestas-NotMod) != true">
 		<!--资源文件-->
 		<Solaestas-EffectFile Include="**/*.fx" Exclude="bin/**/*;obj/**/*" />
 		<Solaestas-ImageFile Include="**/*.png" Exclude="bin/**/*;obj/**/*" />
