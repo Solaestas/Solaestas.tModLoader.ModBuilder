@@ -29,7 +29,7 @@ public class BuildImage : Microsoft.Build.Utilities.Task
 
 			string dir = Path.Combine(OutputDirectory, relativeDir);
 			string filePath = Path.Combine(dir, $"{filename}.rawimg");
-			Log.LogMessage(MessageImportance.High, $"Building {identity} -> {filePath}");
+			Log.LogMessage(MessageImportance.Low, "Building {0} -> {1}", identity, filePath);
 
 			Directory.CreateDirectory(dir);
 			using var output = File.Create(filePath);

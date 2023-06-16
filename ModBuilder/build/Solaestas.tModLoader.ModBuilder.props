@@ -21,7 +21,7 @@
 		<Solaestas-UseMinimalMod>false</Solaestas-UseMinimalMod>
 		<Solaestas-NotMod>false</Solaestas-NotMod>
 		<!--附加功能配置-->
-		<Solaestas-WhitelistMod>HEROsMod;Cheatsheet;DragonLen</Solaestas-WhitelistMod>
+		<Solaestas-WhitelistMod>herosmod;cheatsheet;dragonlen</Solaestas-WhitelistMod>
 		<Solaestas-BuildIgnore>true</Solaestas-BuildIgnore>
 	</PropertyGroup>
 

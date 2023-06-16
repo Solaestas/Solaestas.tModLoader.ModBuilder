@@ -36,7 +36,7 @@
 	<Target Name="Solaestas-BuildEffect" BeforeTargets="BuildMod" Inputs="@(Solaestas-EffectFile)"
 		Outputs="@(Solaestas-EffectFile->'$(OutputPath)Assets\%(RelativeDir)%(Filename).xnb')">
 		<BuildEffect BuilderDirectory="$(Solaestas-ShaderBuilderDirectory)" InputFiles="@(Solaestas-EffectFile)"
-			TargetPlatform="Windows" TargetProfile="HiDef" BuildConfiguration="Release"
+			TargetPlatform="Windows" TargetProfile="HiDef" BuildConfiguration="Debug"
 			IntermediateDirectory="$(IntermediateOutputPath)Assets\"
 			OutputDirectory="$(OutputPath)Assets\" />
 	</Target>

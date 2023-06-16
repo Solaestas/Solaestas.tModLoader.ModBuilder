@@ -50,7 +50,7 @@ var contentCompiler = new ContentCompiler();
 foreach (var file in inputFiles)
 {
 	var output = @$"{outputDir}{Path.ChangeExtension(file, ".xnb")}";
-	helper.LogMessage(MessageImportance.High, $"Building {file} -> {output}");
+	helper.LogMessage(MessageImportance.Low, "Building {0} -> {1}", file, output);
 	try
 	{
 		var input = importer.Import(file, importContext);
