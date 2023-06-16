@@ -16,23 +16,23 @@
 		<Solaestas-TaskPath>$(MSBuildThisFileDirectory)Solaestas.tModLoader.ModBuilder.dll</Solaestas-TaskPath>
 		<Solaestas-ShaderBuilderDirectory>$(MSBuildThisFileDirectory)../tools/</Solaestas-ShaderBuilderDirectory>
 		<!--附加功能开关-->
-		<Solaestas-UseAssetPath>true</Solaestas-UseAssetPath>
-		<Solaestas-UsePublicizer>true</Solaestas-UsePublicizer>
-		<Solaestas-UseMinimalMod>false</Solaestas-UseMinimalMod>
-		<Solaestas-NotMod>false</Solaestas-NotMod>
+		<Solaestas-UseAssetPath Condition="'$(Solaestas-UseAssetPath)' == ''">true</Solaestas-UseAssetPath>
+		<Solaestas-UsePublicizer Condition="'$(Solaestas-UsePublicizer)' == ''">true</Solaestas-UsePublicizer>
+		<Solaestas-UseMinimalMod Condition="'$(Solaestas-UseMinimalMod)' == ''">false</Solaestas-UseMinimalMod>
+		<Solaestas-NotMod Condition="'$(Solaestas-NotMod)' == ''">false</Solaestas-NotMod>
 		<!--附加功能配置-->
-		<Solaestas-WhitelistMod>herosmod;cheatsheet;dragonlen</Solaestas-WhitelistMod>
-		<Solaestas-BuildIgnore>true</Solaestas-BuildIgnore>
+		<Solaestas-WhitelistMod Condition="'$(Solaestas-WhitelistMod)' == ''">herosmod;cheatsheet;dragonlen</Solaestas-WhitelistMod>
+		<Solaestas-BuildIgnore Condition="'$(Solaestas-BuildIgnore)' == ''">true</Solaestas-BuildIgnore>
 	</PropertyGroup>
 
-	<ItemGroup Condition="$(Solaestas-NotMod) != true">
+	<ItemGroup>
 		<!--资源文件-->
 		<Solaestas-EffectFile Include="**/*.fx" Exclude="bin/**/*;obj/**/*" />
 		<Solaestas-ImageFile Include="**/*.png" Exclude="bin/**/*;obj/**/*" />
 		<Solaestas-ImageFile Remove="icon.png" />
 		<Solaestas-ImageFile Remove="workshop_icon*.png" />
 		<Solaestas-HjsonFile Include="**/*.hjson" Exclude="bin/**/*;obj/**/*" />
-		<Solaestas-JsonFile Include="**/*.json" Exclude="bin/**/*;obj/**/*" />
+		<Solaestas-JsonFile Include="**/*.json" Exclude="bin/**/*;obj/**/*;Properties/**/*" />
 		<Solaestas-TextFile Include="**/*.txt" Exclude="bin/**/*;obj/**/*" />
 		<Solaestas-TextFile Remove="build.txt" />
 		<Solaestas-TextFile Remove="description.txt" />

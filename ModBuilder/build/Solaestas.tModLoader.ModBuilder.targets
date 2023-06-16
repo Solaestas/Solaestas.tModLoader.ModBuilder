@@ -28,12 +28,12 @@
 		</GenerateConfig>
 	</Target>
 
-	<Target Name="Solaestas-BuildImage" BeforeTargets="BuildMod" Inputs="@(Solaestas-ImageFile)"
+	<Target Condition="$(Solaestas-NotMod) != true" Name="Solaestas-BuildImage" BeforeTargets="BuildMod" Inputs="@(Solaestas-ImageFile)"
 		Outputs="@(Solaestas-ImageFile->'$(OutputPath)Assets\%(RelativeDir)%(Filename).rawimg')">
 		<BuildImage InputFiles="@(Solaestas-ImageFile)" OutputDirectory="$(OutputPath)Assets\" />
 	</Target>
 
-	<Target Name="Solaestas-BuildEffect" BeforeTargets="BuildMod" Inputs="@(Solaestas-EffectFile)"
+	<Target Condition="$(Solaestas-NotMod) != true" Name="Solaestas-BuildEffect" BeforeTargets="BuildMod" Inputs="@(Solaestas-EffectFile)"
 		Outputs="@(Solaestas-EffectFile->'$(OutputPath)Assets\%(RelativeDir)%(Filename).xnb')">
 		<BuildEffect BuilderDirectory="$(Solaestas-ShaderBuilderDirectory)" InputFiles="@(Solaestas-EffectFile)"
 			TargetPlatform="Windows" TargetProfile="HiDef" BuildConfiguration="Debug"
@@ -42,17 +42,17 @@
 	</Target>
 
 	<!--覆盖tML编译-->
-	<Target Condition="$(Solaestas-NotMod) != true" Name="BuildMod" AfterTargets="Build"
+	<Target Name="BuildMod" AfterTargets="Build"
 		Inputs="@(Solaestas-AssetFile);@(Compile);@(Solaestas-ResourceFile);@(Solaestas-ModFile)"
 		Outputs="$(Solaestas-ModDirectory)$(AssemblyName).tmod">
-		<BuildMod ModSourceDirectory="$(MSBuildProjectDirectory)\" ModName="$(AssemblyName)"
+		<BuildMod Condition="$(Solaestas-NotMod) != true" ModSourceDirectory="$(MSBuildProjectDirectory)\" ModName="$(AssemblyName)"
 			OutputDirectory="$(OutputPath)" ModDirectory="$(Solaestas-ModDirectory)"
 			Configuration="$(Solaestas-Configuration)" AssetFiles="@(Solaestas-AssetFile);"
 			ResourceFiles="@(Solaestas-ResourceFile)" ConfigPath="$(Solaestas-ConfigPath)" 
 			BuildIgnore="$(Solaestas-BuildIgnore)"/>
 	</Target>
 
-	<Target Name="Solaestas-EnableMod" AfterTargets="Build">
+	<Target Condition="$(Solaestas-NotMod) != true" Name="Solaestas-EnableMod" AfterTargets="Build">
 		<EnableMod BuildingMod="$(AssemblyName)" ConfigPath="$(Solaestas-ConfigPath)"
 			MinimalMod="$(Solaestas-UseMinimalMod)" WhitelistMod="$(Solaestas-WhitelistMod)" />
 	</Target>

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.IO.Compression;
 using System.Security.Cryptography;
 
 namespace Solaestas.tModLoader.ModBuilder.ModLoader;
@@ -76,7 +77,25 @@ public class TmodFile : IEnumerable<TmodFile.FileEntry>
 		using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
 		var data = new byte[size];
 		stream.Read(data, 0, size);
-		files[fileName] = new FileEntry(fileName, -1, size, size, data);
+		if (size > MIN_COMPRESS_SIZE && ShouldCompress(fileName))
+		{
+			using var ms = new MemoryStream(size);
+			using var ds = new DeflateStream(ms, CompressionMode.Compress);
+			ds.Write(data, 0, size);
+
+			var compressed = ms.ToArray();
+			if (compressed.Length < size * COMPRESSION_TRADEOFF)
+			{
+				data = compressed;
+			}
+		}
+		files[fileName] = new FileEntry(fileName, -1, size, data.Length, data);
+	}
+
+	private bool ShouldCompress(string fileName)
+	{
+		var ext = System.IO.Path.GetExtension(fileName);
+		return ext is not ".png" or ".mp3" or ".ogg";
 	}
 
 	public void AddFile(string fileName, byte[] data)
