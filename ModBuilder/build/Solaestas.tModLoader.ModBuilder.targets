@@ -45,11 +45,11 @@
 	<Target Condition="$(Solaestas-NotMod) != true" Name="BuildMod" AfterTargets="Build"
 		Inputs="@(Solaestas-AssetFile);@(Compile);@(Solaestas-ResourceFile);@(Solaestas-ModFile)"
 		Outputs="$(Solaestas-ModDirectory)$(AssemblyName).tmod">
-		<BuildMod ModSourceDirectory="$(MSBuildProjectDirectory)" ModName="$(AssemblyName)"
+		<BuildMod ModSourceDirectory="$(MSBuildProjectDirectory)\" ModName="$(AssemblyName)"
 			OutputDirectory="$(OutputPath)" ModDirectory="$(Solaestas-ModDirectory)"
 			Configuration="$(Solaestas-Configuration)" AssetFiles="@(Solaestas-AssetFile);"
 			ResourceFiles="@(Solaestas-ResourceFile)" ConfigPath="$(Solaestas-ConfigPath)" 
-			ResourceStyle="$(Solaestas-ResourceStyle)"/>
+			BuildIgnore="$(Solaestas-BuildIgnore)"/>
 	</Target>
 
 	<Target Name="Solaestas-EnableMod" AfterTargets="Build">

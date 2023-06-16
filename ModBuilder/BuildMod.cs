@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
 using Newtonsoft.Json;
 using Solaestas.tModLoader.ModBuilder.ModLoader;
 
@@ -58,7 +57,8 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 	/// <summary>
 	/// 是否使用BuildIgnore来决定是否包含资源
 	/// </summary>
-	public ResourceStyle ResourceStyle { get; set; }
+	[Required]
+	public bool BuildIgnore { get; set; }
 
 	[Required]
 	public string ConfigPath { get; set; }
@@ -75,7 +75,12 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 		var tmod = new TmodFile(Path.Combine(ModDirectory, $"{ModName}.tmod"), ModName, property.Version);
 
 		var assetDirectory = Path.Combine(OutputDirectory, "Assets") + Path.DirectorySeparatorChar;
-		var prefixLength = assetDirectory.Length + 1;
+		Log.LogMessage(MessageImportance.Normal, "Source Path: {0}", ModSourceDirectory);
+		Log.LogMessage(MessageImportance.Normal, "Output Path: {0}", OutputDirectory);
+		Log.LogMessage(MessageImportance.Normal, "Asset Path: {0}", assetDirectory);
+
+		// Asset路径前缀长度
+		var prefixLength = assetDirectory.Length;
 
 		// Add dll and pdb
 		var dllref = new HashSet<string>(property.DllReferences);
@@ -87,37 +92,40 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 		foreach (var file in AssetFiles)
 		{
 			var identity = file.ItemSpec[prefixLength..];
+			Log.LogMessage(MessageImportance.Low, "Add Asset: {0} -> {1}", file.ItemSpec, identity);
 			tmod.AddFile(identity, file.ItemSpec);
 		}
 
+		prefixLength = ModSourceDirectory.Length;
+
 		// Add Resources
-		if (ResourceStyle == ResourceStyle.Blacklist)
+		if (BuildIgnore)
 		{
+			Log.LogMessage(MessageImportance.Normal, "Read BuildIgnore from build.txt");
 			var files = Directory.EnumerateFiles(ModSourceDirectory, "*", SearchOption.AllDirectories);
 			foreach (var file in files)
 			{
 				var identity = file[prefixLength..];
 				if (!property.IgnoreFile(identity) && !IgnoreFile(identity))
 				{
+					Log.LogMessage(MessageImportance.Low, "Add Resource: {0} -> {1}", file, identity);
 					tmod.AddFile(identity, file);
 				}
 			}
 		}
-		else if (ResourceStyle == ResourceStyle.Whitelist)
+		else
 		{
+			Log.LogMessage(MessageImportance.Normal, "Read resources from MSBuild");
 			foreach (var file in ResourceFiles)
 			{
 				var identity = file.GetMetadata("Path");
-				if(string.IsNullOrEmpty(identity))
+				if (string.IsNullOrEmpty(identity))
 				{
 					identity = file.GetMetadata("Identity");
 				}
+				Log.LogMessage(MessageImportance.Low, "Add Resource: {0} -> {1}", file, identity);
 				tmod.AddFile(identity, file.ItemSpec);
 			}
-		}
-		else
-		{
-			throw new Exception("Unknown resource style");
 		}
 
 		// Add dll
@@ -127,6 +135,7 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 
 			if (name == ModName)
 			{
+				Log.LogMessage(MessageImportance.Low, "Add dll: {0}", file);
 				tmod.AddFile($"{name}.dll", file);
 				continue;
 			}
@@ -141,6 +150,7 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 				dllref.Add(name);
 			}
 
+			Log.LogMessage(MessageImportance.Low, "Add lib: {0} -> {1}", file, name);
 			tmod.AddFile($"lib/{name}.dll", file);
 		}
 
@@ -148,6 +158,7 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 		var pdbPath = Path.Combine(OutputDirectory, $"{ModName}.pdb");
 		if (File.Exists(pdbPath))
 		{
+			Log.LogMessage(MessageImportance.Low, "Add pdb: {0}", pdbPath);
 			tmod.AddFile($"{ModName}.pdb", pdbPath);
 			property.EacPath = pdbPath;
 		}
@@ -183,7 +194,7 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 			return true;
 		}
 
-		if (ext is ".png" or ".cs" or ".md" or ".cache" or ".fx")
+		if (ext is ".png" or ".cs" or ".md" or ".cache" or ".fx" or ".csproj" or ".sln")
 		{
 			return true;
 		}

@@ -22,7 +22,7 @@
 		<Solaestas-NotMod>false</Solaestas-NotMod>
 		<!--附加功能配置-->
 		<Solaestas-WhitelistMod>HEROsMod;Cheatsheet;DragonLen</Solaestas-WhitelistMod>
-		<Solaestas-ResourceStyle>Blacklist</Solaestas-ResourceStyle>
+		<Solaestas-BuildIgnore>true</Solaestas-BuildIgnore>
 	</PropertyGroup>
 
 	<ItemGroup Condition="$(Solaestas-NotMod) != true">
