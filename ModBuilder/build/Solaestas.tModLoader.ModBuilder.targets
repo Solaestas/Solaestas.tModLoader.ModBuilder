@@ -64,7 +64,7 @@
 			<Solaestas-AssetClassName Condition="'$(Solaestas-AssetClassName)' == ''">ModAsset</Solaestas-AssetClassName>
 		</PropertyGroup>
 		<GeneratePath AssetFiles="@(Solaestas-EffectFile);@(Solaestas-ImageFile);@(Solaestas-ResourceFile)"
-			ClassName="$(Solaestas-AssetClassName)"
+			ClassName="$(Solaestas-AssetClassName)" AssetPrefix="$(Solaestas-AssetPrefix)"
 			Namespace="$(Solaestas-AssetNamespace)" OutputDirectory="$(BaseIntermediateOutputPath)" />
 	</Target>
 

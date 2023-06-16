@@ -14,6 +14,7 @@ document is not finished yet
 | `Solaestas-NotMod` | Indicate that this project is not a mod. | `false` | `true` or `false` |
 | `Solaestas-WhitelistMod` | white list mod which avoid to be disable via `UseMinimalMod` | `herosmod;cheatsheet;dragonlen` | `[Mod Name]` |
 | `Solaestas-BuildIgnore` | `true`: read ignore files from build.txt<br>`false`: only read resource file defined in msbuild| `true` | `true` or `false` |
+| `Solaestas-AssetPrefix` | Prefix of asset path | `string.Empty` | `[string]` |
 
 ## TODO
 

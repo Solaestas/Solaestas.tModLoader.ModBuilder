@@ -72,16 +72,17 @@ public class TmodFile : IEnumerable<TmodFile.FileEntry>
 	public void AddFile(string fileName, string filePath)
 	{
 		fileName = Sanitize(fileName);
-		var fileInfo = new FileInfo(filePath);
-		int size = (int)fileInfo.Length;
 		using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+		int size = (int)stream.Length;
 		var data = new byte[size];
 		stream.Read(data, 0, size);
 		if (size > MIN_COMPRESS_SIZE && ShouldCompress(fileName))
 		{
 			using var ms = new MemoryStream(size);
-			using var ds = new DeflateStream(ms, CompressionMode.Compress);
-			ds.Write(data, 0, size);
+			using (var ds = new DeflateStream(ms, CompressionMode.Compress))
+			{
+				ds.Write(data, 0, size);
+			}
 
 			var compressed = ms.ToArray();
 			if (compressed.Length < size * COMPRESSION_TRADEOFF)

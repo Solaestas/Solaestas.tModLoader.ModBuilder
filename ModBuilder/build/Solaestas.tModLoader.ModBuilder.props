@@ -43,9 +43,9 @@
 		<Solaestas-ResourceFile Include="@(Solaestas-JsonFile)" />
 		<Solaestas-ResourceFile Include="@(Solaestas-TextFile)" />
 		<Solaestas-ResourceFile Include="@(Solaestas-MusicFile)" />
+		<Solaestas-ResourceFile Include="icon.png" />
 		<Solaestas-ModFile Include="build.txt" />
 		<Solaestas-ModFile Include="description.txt" />
-		<Solaestas-ModFile Include="icon.png" />
 	</ItemGroup>
 
 	<ItemGroup Condition="$(Solaestas-UsePublicizer)">
