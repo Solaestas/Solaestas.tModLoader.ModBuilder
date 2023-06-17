@@ -50,6 +50,8 @@ public class GenerateConfig : Task
 			: identifier.Contains("stable") ? GameVersion.Stable
 			: throw new Exception("Unknown game version, not in {stable, preview, dev}");
 
+		Log.LogMessage(MessageImportance.High, "Detect tModLoader Version: {0}", version.ToString());
+
 		ModDirectory = Path.Combine(
 			Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
 			"My Games",

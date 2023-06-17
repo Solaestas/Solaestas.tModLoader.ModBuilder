@@ -1,5 +1,3 @@
-using System;
-
 namespace Solaestas.tModLoader.ModBuilder.ModLoader;
 
 public class BuildInfo
@@ -59,7 +57,7 @@ public class BuildInfo
 		VersionedName = $"tModLoader v{tMLVersion}";
 
 		if (!string.IsNullOrEmpty(BranchName) && BranchName != "unknown"
-			&& BranchName != "1.4-stable" && BranchName != "1.4-preview" && BranchName != "1.4")
+			&& BranchName != "stable" && BranchName != "preview" && BranchName != "1.4")
 		{
 			VersionedName += $" {BranchName}";
 		}
