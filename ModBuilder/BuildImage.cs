@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using Microsoft.Build.Framework;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -18,6 +19,10 @@ public class BuildImage : Microsoft.Build.Utilities.Task
 	[Required]
 	public required string OutputDirectory { get; set; }
 
+	public const uint MIN_COMPRESS_SIZE = 1 << 10; // 1KB
+
+	public const float COMPRESSION_TRADEOFF = 0.9f;
+
 	public override bool Execute()
 	{
 		Log.LogMessage(MessageImportance.High, "Building Images...");
@@ -34,7 +39,29 @@ public class BuildImage : Microsoft.Build.Utilities.Task
 			Directory.CreateDirectory(dir);
 			using var output = File.Create(filePath);
 			using var input = File.OpenRead(file.ItemSpec);
-			ImageIO.ToRaw(input, output);
+			using var ms = new MemoryStream();
+			ImageIO.ToRaw(input, ms);
+			var data = ms.ToArray();
+			int size = data.Length;
+
+			// 提前压缩
+			if (size > MIN_COMPRESS_SIZE)
+			{
+				ms.Position = 0;
+				using (var ds = new DeflateStream(ms, CompressionMode.Compress))
+				{
+					ds.Write(data, 0, size);
+				}
+
+				var compressed = ms.ToArray();
+				if (compressed.Length < size * COMPRESSION_TRADEOFF)
+				{
+					data = compressed;
+				}
+			}
+			var sizeBytes = BitConverter.GetBytes(size);
+			output.Write(sizeBytes, 0, sizeBytes.Length);
+			output.Write(data, 0, data.Length);
 		}
 		return true;
 	}
@@ -48,7 +75,7 @@ public static class ImageIO
 	public static void ToRaw(Stream source, Stream destination)
 	{
 		var image = Image.Load<Rgba32>(source);
-		using var writer = new BinaryWriter(destination);
+		var writer = new BinaryWriter(destination);
 
 		// 不知道为啥要写一个1进去
 		writer.Write(1);

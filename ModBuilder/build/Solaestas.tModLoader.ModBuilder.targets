@@ -69,8 +69,9 @@
 	</Target>
 
 	<Target Name="Solaestas-CleanAsset" BeforeTargets="Clean">
-		<RemoveDir Directories="$(OutputPath)Assets" />
 		<RemoveDir Directories="$(IntermediateOutputPath)Assets" />
 		<Delete Condition="$(Solaestas-UseAssetPath)" Files="$(BaseIntermediateOutputPath)ModPath.g.cs" />
+		<Delete Condition="$(SOlaestas-NotMod) != true" Files="@(Solaestas-ImageFile->'$(OutputPath)Assets\%(RelativeDir)%(Filename).rawimg')" />
+		<Delete Condition="$(SOlaestas-NotMod) != true" Files="@(Solaestas-EffectFile->'$(OutputPath)Assets\%(RelativeDir)%(Filename).xnb')" />
 	</Target>
 </Project>

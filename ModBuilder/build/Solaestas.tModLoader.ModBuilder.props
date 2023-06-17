@@ -43,7 +43,7 @@
 		<Solaestas-ResourceFile Include="@(Solaestas-JsonFile)" />
 		<Solaestas-ResourceFile Include="@(Solaestas-TextFile)" />
 		<Solaestas-ResourceFile Include="@(Solaestas-MusicFile)" />
-		<Solaestas-ResourceFile Include="icon.png" />
+		<Solaestas-ResourceFile Condition="Exists('icon.png')" Include="icon.png" />
 		<Solaestas-ModFile Include="build.txt" />
 		<Solaestas-ModFile Include="description.txt" />
 	</ItemGroup>
