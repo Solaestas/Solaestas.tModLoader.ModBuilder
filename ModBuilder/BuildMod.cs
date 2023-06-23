@@ -72,7 +72,7 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 		Log.LogMessage(MessageImportance.High, $"Building {ModName} -> {Path.Combine(ModDirectory, $"{ModName}.tmod")}");
 		var sw = Stopwatch.StartNew();
 
-		var property = BuildProperties.ReadBuildFile(ModSourceDirectory);
+		var property = BuildProperties.ReadBuildFile(ModSourceDirectory, info);
 		var tmod = new TmodFile(Path.Combine(ModDirectory, $"{ModName}.tmod"), ModName, property.Version);
 
 		var assetDirectory = Path.Combine(OutputDirectory, "Assets") + Path.DirectorySeparatorChar;
@@ -190,7 +190,12 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 			return true;
 		}
 
-		if (path is "icon.png" or "build.txt" or "description.txt")
+		if(path is "icon.png")
+		{
+			return false;
+		}
+
+		if (path is "build.txt" or "description.txt")
 		{
 			return true;
 		}

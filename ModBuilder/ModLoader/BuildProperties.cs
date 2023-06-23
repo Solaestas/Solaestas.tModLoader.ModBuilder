@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Solaestas.tModLoader.ModBuilder.ModLoader;
@@ -53,89 +48,7 @@ public class BuildProperties
 
 	public ModReference[] WeakReferences = Array.Empty<ModReference>();
 
-	public static void InfoToBuildTxt(Stream src, Stream dst, BuildInfo info)
-	{
-		BuildProperties properties = ReadFromStream(src, info);
-		var sb = new StringBuilder();
-		if (properties.DisplayName.Length > 0)
-		{
-			sb.AppendLine($"displayName = {properties.DisplayName}");
-		}
-
-		if (properties.Author.Length > 0)
-		{
-			sb.AppendLine($"author = {properties.Author}");
-		}
-
-		sb.AppendLine($"version = {properties.Version}");
-		if (properties.Homepage.Length > 0)
-		{
-			sb.AppendLine($"homepage = {properties.Homepage}");
-		}
-
-		if (properties.DllReferences.Length > 0)
-		{
-			sb.AppendLine($"dllReferences = {string.Join(", ", properties.DllReferences)}");
-		}
-
-		if (properties.ModReferences.Length > 0)
-		{
-			sb.AppendLine($"modReferences = {string.Join(", ", properties.ModReferences)}");
-		}
-
-		if (properties.WeakReferences.Length > 0)
-		{
-			sb.AppendLine($"weakReferences = {string.Join(", ", properties.WeakReferences)}");
-		}
-
-		if (properties.NoCompile)
-		{
-			sb.AppendLine($"noCompile = true");
-		}
-
-		if (properties.HideCode)
-		{
-			sb.AppendLine($"hideCode = true");
-		}
-
-		if (properties.HideResources)
-		{
-			sb.AppendLine($"hideResources = true");
-		}
-
-		if (properties.IncludeSource)
-		{
-			sb.AppendLine($"includeSource = true");
-		}
-
-		if (!properties.PlayableOnPreview)
-		{
-			sb.AppendLine($"playableOnPreview = false");
-		}
-
-		// buildIgnores isn't preserved in Info, but it doesn't matter with extraction since the
-		// ignored files won't be present anyway. if (properties.buildIgnores.Length > 0)
-		// sb.AppendLine($"buildIgnores = {string.Join(", ", properties.buildIgnores)}");
-		if (properties.Side != ModSide.Both)
-		{
-			sb.AppendLine($"side = {properties.Side}");
-		}
-
-		if (properties.SortAfter.Length > 0)
-		{
-			sb.AppendLine($"sortAfter = {string.Join(", ", properties.SortAfter)}");
-		}
-
-		if (properties.SortBefore.Length > 0)
-		{
-			sb.AppendLine($"sortBefore = {string.Join(", ", properties.SortBefore)}");
-		}
-
-		var bytes = Encoding.UTF8.GetBytes(sb.ToString());
-		dst.Write(bytes, 0, bytes.Length);
-	}
-
-	public static BuildProperties ReadBuildFile(string modDir)
+	public static BuildProperties ReadBuildFile(string modDir, BuildInfo info)
 	{
 		string propertiesFile = Path.Combine(modDir, "build.txt");
 		string descriptionfile = Path.Combine(modDir, "description.txt");
@@ -144,6 +57,8 @@ public class BuildProperties
 		{
 			return properties;
 		}
+
+		properties.BuildVersion = info.tMLVersion;
 
 		if (File.Exists(descriptionfile))
 		{
@@ -246,114 +161,6 @@ public class BuildProperties
 		// add (mod|weak)References that are not in sortBefore to sortAfter
 		properties.SortAfter = properties.RefNames(true).Where(dep => !properties.SortBefore.Contains(dep))
 			.Concat(properties.SortAfter).Distinct().ToArray();
-
-		return properties;
-	}
-
-	public static BuildProperties ReadFromStream(Stream stream, BuildInfo info)
-	{
-		var properties = new BuildProperties
-		{
-			// While the intended defaults for these are false, Info will only have !hideCode and
-			// !hideResources entries, so this is necessary.
-			HideCode = true,
-			HideResources = true,
-		};
-		using (var reader = new BinaryReader(stream))
-		{
-			for (string tag = reader.ReadString(); tag.Length > 0; tag = reader.ReadString())
-			{
-				if (tag == "dllReferences")
-				{
-					properties.DllReferences = ReadList(reader).ToArray();
-				}
-
-				if (tag == "modReferences")
-				{
-					properties.ModReferences = ReadList(reader).Select(ModReference.Parse).ToArray();
-				}
-
-				if (tag == "weakReferences")
-				{
-					properties.WeakReferences = ReadList(reader).Select(ModReference.Parse).ToArray();
-				}
-
-				if (tag == "sortAfter")
-				{
-					properties.SortAfter = ReadList(reader).ToArray();
-				}
-
-				if (tag == "sortBefore")
-				{
-					properties.SortBefore = ReadList(reader).ToArray();
-				}
-
-				if (tag == "author")
-				{
-					properties.Author = reader.ReadString();
-				}
-
-				if (tag == "version")
-				{
-					properties.Version = new Version(reader.ReadString());
-				}
-
-				if (tag == "displayName")
-				{
-					properties.DisplayName = reader.ReadString();
-				}
-
-				if (tag == "homepage")
-				{
-					properties.Homepage = reader.ReadString();
-				}
-
-				if (tag == "description")
-				{
-					properties.Description = reader.ReadString();
-				}
-
-				if (tag == "noCompile")
-				{
-					properties.NoCompile = true;
-				}
-
-				if (tag == "!playableOnPreview")
-				{
-					properties.PlayableOnPreview = false;
-				}
-
-				if (tag == "!hideCode")
-				{
-					properties.HideCode = false;
-				}
-
-				if (tag == "!hideResources")
-				{
-					properties.HideResources = false;
-				}
-
-				if (tag == "includeSource")
-				{
-					properties.IncludeSource = true;
-				}
-
-				if (tag == "eacPath")
-				{
-					properties.EacPath = reader.ReadString();
-				}
-
-				if (tag == "side")
-				{
-					properties.Side = (ModSide)reader.ReadByte();
-				}
-
-				if (tag == "buildVersion")
-				{
-					properties.BuildVersion = new Version(reader.ReadString());
-				}
-			}
-		}
 
 		return properties;
 	}
@@ -529,17 +336,6 @@ public class BuildProperties
 	private static IEnumerable<string> ReadList(string value)
 	{
 		return value.Split(',').Select(s => s.Trim()).Where(s => s.Length > 0);
-	}
-
-	private static IEnumerable<string> ReadList(BinaryReader reader)
-	{
-		var list = new List<string>();
-		for (string item = reader.ReadString(); item.Length > 0; item = reader.ReadString())
-		{
-			list.Add(item);
-		}
-
-		return list;
 	}
 
 	private static void WriteList<T>(IEnumerable<T> list, BinaryWriter writer)
