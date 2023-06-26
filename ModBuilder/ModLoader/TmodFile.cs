@@ -69,7 +69,7 @@ public class TmodFile : IEnumerable<TmodFile.FileEntry>
 		Version = version;
 	}
 
-	public void AddFile(string fileName, string filePath)
+	public bool AddFile(string fileName, string filePath)
 	{
 		fileName = Sanitize(fileName);
 		using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
@@ -84,7 +84,7 @@ public class TmodFile : IEnumerable<TmodFile.FileEntry>
 			size = BitConverter.ToInt32(sizeBytes, 0);
 			stream.Read(imgData, 0, size - 4);
 			files[fileName] = new FileEntry(fileName, -1, size, imgData.Length, imgData);
-			return;
+			return true;
 		}
 
 		var data = new byte[size];
@@ -104,12 +104,13 @@ public class TmodFile : IEnumerable<TmodFile.FileEntry>
 			}
 		}
 		files[fileName] = new FileEntry(fileName, -1, size, data.Length, data);
+		return data.Length != size;
 	}
 
 	private bool ShouldCompress(string fileName)
 	{
 		var ext = System.IO.Path.GetExtension(fileName);
-		return ext is not ".png" or ".mp3" or ".ogg" or ".rawimg";
+		return ext is not ".png" and not ".mp3" and not ".ogg" and not ".rawimg";
 	}
 
 	public void AddFile(string fileName, byte[] data)

@@ -4,6 +4,14 @@ This is a NuGet package for tModLoader mod makers which modifies and automates m
 
 document is not finished yet
 
+## Feature
+
+- Include referenced dll automatically
+- Generate cache file for png
+- Compile and Include fx files automatically
+- Generate asset path automatically (Optional)
+- Disable other mods automatically in building (Optional)
+
 ## Supported Config
 
 The following configs are all MSBuild Properties, which can be set in `csproj` file or `Directory.Build.props` file.

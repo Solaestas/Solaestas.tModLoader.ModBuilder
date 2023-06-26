@@ -93,8 +93,8 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 		foreach (var file in AssetFiles)
 		{
 			var identity = file.ItemSpec[prefixLength..];
-			Log.LogMessage(MessageImportance.Low, "Add Asset: {0} -> {1}", file.ItemSpec, identity);
-			tmod.AddFile(identity, file.ItemSpec);
+			bool compressed = tmod.AddFile(identity, file.ItemSpec);
+			Log.LogMessage(MessageImportance.Low, "Add {2}Asset: {0} -> {1}", file.ItemSpec, identity, compressed ? "Compressed " : string.Empty);
 		}
 
 		prefixLength = ModSourceDirectory.Length;
@@ -109,8 +109,8 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 				var identity = file[prefixLength..];
 				if (!property.IgnoreFile(identity) && !IgnoreFile(identity))
 				{
-					Log.LogMessage(MessageImportance.Low, "Add Resource: {0} -> {1}", file, identity);
-					tmod.AddFile(identity, file);
+					bool compressed = tmod.AddFile(identity, file);
+					Log.LogMessage(MessageImportance.Low, "Add {2}Resource: {0} -> {1}", file, identity, compressed ? "Compressed " : string.Empty);
 				}
 			}
 		}
@@ -124,8 +124,8 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 				{
 					identity = file.GetMetadata("Identity");
 				}
-				Log.LogMessage(MessageImportance.Low, "Add Resource: {0} -> {1}", file, identity);
-				tmod.AddFile(identity, file.ItemSpec);
+				bool compressed = tmod.AddFile(identity, file.ItemSpec);
+				Log.LogMessage(MessageImportance.Low, "Add {2}Resource: {0} -> {1}", file, identity, compressed ? "Compressed " : string.Empty);
 			}
 		}
 
