@@ -1,6 +1,7 @@
 using Terraria.ModLoader;
 
 namespace TestMod;
+
 public class TestMod : Mod
 {
 	public override void Load()
@@ -8,4 +9,3 @@ public class TestMod : Mod
 		base.Load();
 	}
 }
-

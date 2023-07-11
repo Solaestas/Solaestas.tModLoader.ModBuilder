@@ -17,7 +17,7 @@
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>tModLoader</PackageTags>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<Version>1.0.3.0</Version>
+		<Version>1.1.0.0</Version>
 	</PropertyGroup>
 
   <ItemGroup>

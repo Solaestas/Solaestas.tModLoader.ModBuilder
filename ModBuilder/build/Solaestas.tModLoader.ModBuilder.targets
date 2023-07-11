@@ -43,7 +43,7 @@
 
 	<!--覆盖tML编译-->
 	<Target Name="BuildMod" AfterTargets="Build"
-		Inputs="@(Solaestas-AssetFile);@(Compile);@(Solaestas-ResourceFile);@(Solaestas-ModFile)"
+		Inputs="@(Solaestas-AssetFile);$(OutputPath)*.dll;$(OutputPath)*.pdb;@(Solaestas-ResourceFile);@(Solaestas-ModFile)"
 		Outputs="$(Solaestas-ModDirectory)$(AssemblyName).tmod">
 		<BuildMod Condition="$(Solaestas-NotMod) != true" ModSourceDirectory="$(MSBuildProjectDirectory)\" ModName="$(AssemblyName)"
 			OutputDirectory="$(OutputPath)" ModDirectory="$(Solaestas-ModDirectory)"
@@ -71,7 +71,6 @@
 	<Target Name="Solaestas-CleanAsset" BeforeTargets="Clean">
 		<RemoveDir Directories="$(IntermediateOutputPath)Assets" />
 		<Delete Condition="$(Solaestas-UseAssetPath)" Files="$(BaseIntermediateOutputPath)ModPath.g.cs" />
-		<Delete Condition="$(SOlaestas-NotMod) != true" Files="@(Solaestas-ImageFile->'$(OutputPath)Assets\%(RelativeDir)%(Filename).rawimg')" />
-		<Delete Condition="$(SOlaestas-NotMod) != true" Files="@(Solaestas-EffectFile->'$(OutputPath)Assets\%(RelativeDir)%(Filename).xnb')" />
+		<Delete Condition="$(SOlaestas-NotMod) != true" Files="@(Solaestas-AssetFile)" />
 	</Target>
 </Project>

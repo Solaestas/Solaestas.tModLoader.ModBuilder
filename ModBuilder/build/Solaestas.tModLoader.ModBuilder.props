@@ -44,8 +44,9 @@
 		<Solaestas-ResourceFile Include="@(Solaestas-TextFile)" />
 		<Solaestas-ResourceFile Include="@(Solaestas-MusicFile)" />
 		<Solaestas-ResourceFile Condition="Exists('icon.png')" Include="icon.png" />
-		<Solaestas-ModFile Include="build.txt" />
-		<Solaestas-ModFile Include="description.txt" />
+		<Solaestas-ModFile Condition="Exists('build.txt')" Include="build.txt" />
+		<Solaestas-ModFile Condition="Exists('description.txt')" Include="description.txt" />
+		<AvailableItemName Include="Solaestas-ModFile;Solaestas-ResourceFile;Solaestas-EffectFile;Solaestas-ImageFile" />
 	</ItemGroup>
 
 	<ItemGroup Condition="$(Solaestas-UsePublicizer)">

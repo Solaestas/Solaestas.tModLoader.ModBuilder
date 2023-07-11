@@ -68,7 +68,6 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 	{
 		var config = JsonConvert.DeserializeObject<BuildConfig>(File.ReadAllText(ConfigPath)) ?? throw new Exception("Build Config not found");
 		var info = new BuildInfo(config);
-		Log.LogMessage(MessageImportance.High, "Building Mod...");
 		Log.LogMessage(MessageImportance.High, $"Building {ModName} -> {Path.Combine(ModDirectory, $"{ModName}.tmod")}");
 		var sw = Stopwatch.StartNew();
 
@@ -152,7 +151,7 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 			}
 
 			Log.LogMessage(MessageImportance.Low, "Add lib: {0} -> {1}", file, name);
-			tmod.AddFile($"lib/{name}.dll", file);
+			tmod.AddFile($"lib\\{name}.dll", file);
 		}
 
 		// Add pdb

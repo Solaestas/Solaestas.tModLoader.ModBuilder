@@ -63,7 +63,7 @@ public class GenerateConfig : Task
 				GameVersion.Developer => "tModLoader-dev",
 				_ => throw new Exception("Unknown game version, not in {stable, preview, dev}")
 			},
-			"Mods/");
+			"Mods\\");
 
 		if (!Directory.Exists(ModDirectory))
 		{

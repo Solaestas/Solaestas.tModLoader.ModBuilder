@@ -5,30 +5,21 @@ using System.Security.Cryptography;
 namespace Solaestas.tModLoader.ModBuilder.ModLoader;
 
 // warning class is not threadsafe
-public class TmodFile : IEnumerable<TmodFile.FileEntry>
+public class TmodFile(string path, string name, Version version) : IEnumerable<TmodFile.FileEntry>
 {
-	public class FileEntry
+	public class FileEntry(string name, int offset, int length, int compressedLength, byte[] cachedBytes = null)
 	{
-		public string Name { get; }
+		public string Name { get; } = name;
 
 		// from the start of the file
-		public int Offset { get; set; }
+		public int Offset { get; set; } = offset;
 
-		public int Length { get; }
+		public int Length { get; } = length;
 
-		public int CompressedLength { get; }
+		public int CompressedLength { get; } = compressedLength;
 
 		// intended to be readonly, but unfortunately no ReadOnlySpan on .NET 4.5
-		public byte[] CachedBytes { get; }
-
-		public FileEntry(string name, int offset, int length, int compressedLength, byte[] cachedBytes = null)
-		{
-			Name = name;
-			Offset = offset;
-			Length = length;
-			CompressedLength = compressedLength;
-			CachedBytes = cachedBytes;
-		}
+		public byte[] CachedBytes { get; } = cachedBytes;
 
 		public bool IsCompressed => Length != CompressedLength;
 	}
@@ -44,7 +35,7 @@ public class TmodFile : IEnumerable<TmodFile.FileEntry>
 		return path.Replace('\\', '/');
 	}
 
-	public readonly string Path;
+	public readonly string Path = path;
 
 	private FileStream fileStream;
 
@@ -54,20 +45,13 @@ public class TmodFile : IEnumerable<TmodFile.FileEntry>
 
 	public Version TModLoaderVersion { get; private set; }
 
-	public string Name { get; private set; }
+	public string Name { get; private set; } = name;
 
-	public Version Version { get; private set; }
+	public Version Version { get; private set; } = version;
 
 	public byte[] Hash { get; private set; }
 
 	public byte[] Signature { get; private set; } = new byte[256];
-
-	public TmodFile(string path, string name, Version version)
-	{
-		Path = path;
-		Name = name;
-		Version = version;
-	}
 
 	public bool AddFile(string fileName, string filePath)
 	{

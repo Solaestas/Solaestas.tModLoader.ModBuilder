@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using Microsoft.Build.Framework;
+using Newtonsoft.Json;
 using Task = Microsoft.Build.Utilities.Task;
 
 namespace Solaestas.tModLoader.ModBuilder;
@@ -59,8 +60,45 @@ public class GeneratePath : Task
 
 	public string ClassName { get; set; } = "ModAsset";
 
+	public const string CacheFile = "PathGenerateCache";
+
 	public override unsafe bool Execute()
 	{
+		string cachePath = Path.Combine(OutputDirectory, CacheFile);
+		bool needRebuild = false;
+
+		// Load Cache
+		if (File.Exists(cachePath))
+		{
+			using var cacheStream = File.OpenText(cachePath);
+			foreach (var file in AssetFiles)
+			{
+				if (cacheStream.EndOfStream)
+				{
+					needRebuild = true;
+					break;
+				}
+				var line = cacheStream.ReadLine();
+				if (line != file.ItemSpec)
+				{
+					needRebuild = true;
+					break;
+				}
+			}
+		}
+
+		// Save Cache
+		using var writer = File.CreateText(cachePath);
+		foreach(var file in AssetFiles)
+		{
+			writer.WriteLine(file.ItemSpec);
+		}
+
+		if (!needRebuild)
+		{
+			return true;
+		}
+
 		var sb = new StringBuilder();
 		int index = Namespace.IndexOf('.');
 		string modName = index == -1 ? Namespace : Namespace[..index];
