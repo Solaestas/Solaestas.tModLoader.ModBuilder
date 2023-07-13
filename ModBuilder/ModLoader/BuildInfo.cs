@@ -43,41 +43,71 @@ public class BuildInfo
 	public BuildInfo(BuildConfig config)
 	{
 		BuildIdentifier = config.BuildIdentifier;
-		var parts = BuildIdentifier[(BuildIdentifier.IndexOf('+') + 1)..].Split('|');
-		int i = 0;
-
-		tMLVersion = new Version(parts[i++]);
-		StableVersion = new Version(parts[i++]);
-		BranchName = parts[i++];
-		Enum.TryParse(parts[i++], true, out Purpose);
-		CommitSHA = parts[i++];
-		BuildDate = DateTime.FromBinary(long.Parse(parts[i++])).ToLocalTime();
-
-		// Version name for players
-		VersionedName = $"tModLoader v{tMLVersion}";
-
-		if (!string.IsNullOrEmpty(BranchName) && BranchName != "unknown"
-			&& BranchName != "stable" && BranchName != "preview" && BranchName != "1.4")
+		if (config.Version == GameVersion.Stable)
 		{
-			VersionedName += $" {BranchName}";
+			string[] array = BuildIdentifier[(BuildIdentifier.IndexOf('+') + 1)..].Split('|');
+			int i = 0;
+			tMLVersion = new Version(array[i++]);
+			StableVersion = new Version(array[i++]);
+			BranchName = array[i++];
+			Enum.TryParse<BuildPurpose>(array[i++], ignoreCase: true, out Purpose);
+			CommitSHA = array[i++];
+			BuildDate = DateTime.FromBinary(long.Parse(array[i++])).ToLocalTime();
+			VersionedName = $"tModLoader v{tMLVersion}";
+			if (!string.IsNullOrEmpty(BranchName) && BranchName != "unknown" && BranchName != "stable" && BranchName != "preview" && BranchName != "1.4")
+			{
+				VersionedName = VersionedName + " " + BranchName;
+			}
+			if (Purpose != BuildPurpose.Stable)
+			{
+				VersionedName += $" {Purpose}";
+			}
+			VersionTag = VersionedName["tModLoader ".Length..].Replace(' ', '-').ToLower();
+			VersionedNameDevFriendly = VersionedName;
+			if (CommitSHA != "unknown")
+			{
+				VersionedNameDevFriendly = VersionedNameDevFriendly + " " + CommitSHA[..8];
+			}
+			VersionedNameDevFriendly += $", built {BuildDate:g}";
 		}
-
-		if (Purpose != BuildPurpose.Stable)
+		else
 		{
-			VersionedName += $" {Purpose}";
+			var parts = BuildIdentifier[(BuildIdentifier.IndexOf('+') + 1)..].Split('|');
+			int i = 0;
+
+			tMLVersion = new Version(parts[i++]);
+			StableVersion = new Version(parts[i++]);
+			BranchName = parts[i++];
+			Enum.TryParse(parts[i++], true, out Purpose);
+			CommitSHA = parts[i++];
+			BuildDate = DateTime.FromBinary(long.Parse(parts[i++])).ToLocalTime();
+
+			// Version name for players
+			VersionedName = $"tModLoader v{tMLVersion}";
+
+			if (!string.IsNullOrEmpty(BranchName) && BranchName != "unknown"
+				&& BranchName != "stable" && BranchName != "preview" && BranchName != "1.4")
+			{
+				VersionedName += $" {BranchName}";
+			}
+
+			if (Purpose != BuildPurpose.Stable)
+			{
+				VersionedName += $" {Purpose}";
+			}
+
+			// Version Tag for ???
+			VersionTag = VersionedName["tModLoader ".Length..].Replace(' ', '-').ToLower();
+
+			// Version name for modders
+			VersionedNameDevFriendly = VersionedName;
+
+			if (CommitSHA != "unknown")
+			{
+				VersionedNameDevFriendly += $" {CommitSHA[..8]}";
+			}
+
+			VersionedNameDevFriendly += $", built {BuildDate:g}";
 		}
-
-		// Version Tag for ???
-		VersionTag = VersionedName["tModLoader ".Length..].Replace(' ', '-').ToLower();
-
-		// Version name for modders
-		VersionedNameDevFriendly = VersionedName;
-
-		if (CommitSHA != "unknown")
-		{
-			VersionedNameDevFriendly += $" {CommitSHA[..8]}";
-		}
-
-		VersionedNameDevFriendly += $", built {BuildDate:g}";
 	}
 }

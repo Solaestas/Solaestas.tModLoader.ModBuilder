@@ -86,6 +86,10 @@ public class GeneratePath : Task
 				}
 			}
 		}
+		else
+		{
+			needRebuild = true;
+		}
 
 		// Save Cache
 		using var writer = File.CreateText(cachePath);
