@@ -42,12 +42,14 @@ public class BuildImage : Microsoft.Build.Utilities.Task
 			using var ms = new MemoryStream();
 			ImageIO.ToRaw(input, ms);
 			var data = ms.ToArray();
+
+			// 原文件长度
 			int size = data.Length;
 
 			// 提前压缩
 			if (size > MIN_COMPRESS_SIZE)
 			{
-				ms.Position = 0;
+				ms.SetLength(0);
 				using (var ds = new DeflateStream(ms, CompressionMode.Compress))
 				{
 					ds.Write(data, 0, size);

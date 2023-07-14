@@ -65,10 +65,10 @@ public class TmodFile(string path, string name, Version version) : IEnumerable<T
 			var imgData = new byte[size - sizeof(int)];
 			var sizeBytes = new byte[4];
 			stream.Read(sizeBytes, 0, 4);
+			stream.Read(imgData, 0, size - sizeof(int));
 			size = BitConverter.ToInt32(sizeBytes, 0);
-			stream.Read(imgData, 0, size - 4);
 			files[fileName] = new FileEntry(fileName, -1, size, imgData.Length, imgData);
-			return true;
+			return size != imgData.Length;
 		}
 
 		var data = new byte[size];

@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
 using Newtonsoft.Json;
 using Solaestas.tModLoader.ModBuilder.ModLoader;
 
@@ -92,6 +91,10 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 		foreach (var file in AssetFiles)
 		{
 			var identity = file.ItemSpec[prefixLength..];
+			if (property.IgnoreFile(identity))
+			{
+				continue;
+			}
 			bool compressed = tmod.AddFile(identity, file.ItemSpec);
 			Log.LogMessage(MessageImportance.Low, "Add {2}Asset: {0} -> {1}", file.ItemSpec, identity, compressed ? "Compressed " : string.Empty);
 		}
@@ -106,7 +109,7 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 			foreach (var file in files)
 			{
 				var identity = file[prefixLength..];
-				if (!property.IgnoreFile(identity) && !IgnoreFile(identity))
+				if (!property.IgnoreFile(identity) && !IgnoreFile(identity, property))
 				{
 					bool compressed = tmod.AddFile(identity, file);
 					Log.LogMessage(MessageImportance.Low, "Add {2}Resource: {0} -> {1}", file, identity, compressed ? "Compressed " : string.Empty);
@@ -173,7 +176,7 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 		return true;
 	}
 
-	public bool IgnoreFile(string path)
+	public bool IgnoreFile(string path, BuildProperties properties)
 	{
 		var ext = Path.GetExtension(path);
 
@@ -189,17 +192,22 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 			return true;
 		}
 
-		if(path is "icon.png")
+		if (path is "icon.png")
 		{
 			return false;
 		}
 
-		if (path is "build.txt" or "description.txt")
+		if (path is "build.txt" or "description.txt" or "description_workshop.txt" or "LICENSE.txt")
 		{
 			return true;
 		}
 
-		if (ext is ".png" or ".cs" or ".md" or ".cache" or ".fx" or ".csproj" or ".sln")
+		if (!properties.IncludeSource && ext is ".cs" or ".fx" or ".csproj" or ".sln")
+		{
+			return true;
+		}
+
+		if (ext is ".png" or ".md" or ".cache")
 		{
 			return true;
 		}

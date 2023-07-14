@@ -30,7 +30,6 @@
 		<Solaestas-EffectFile Include="**/*.fx" Exclude="bin/**/*;obj/**/*" />
 		<Solaestas-ImageFile Include="**/*.png" Exclude="bin/**/*;obj/**/*" />
 		<Solaestas-ImageFile Remove="icon.png" />
-		<Solaestas-ImageFile Remove="workshop_icon*.png" />
 		<Solaestas-HjsonFile Include="**/*.hjson" Exclude="bin/**/*;obj/**/*" />
 		<Solaestas-JsonFile Include="**/*.json" Exclude="bin/**/*;obj/**/*;Properties/**/*" />
 		<Solaestas-TextFile Include="**/*.txt" Exclude="bin/**/*;obj/**/*" />

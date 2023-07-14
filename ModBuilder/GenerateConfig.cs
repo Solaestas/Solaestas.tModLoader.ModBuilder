@@ -61,7 +61,7 @@ public class GenerateConfig : Task
 				GameVersion.Stable => "tModLoader",
 				GameVersion.Preview => "tModLoader-preview",
 				GameVersion.Developer => "tModLoader-dev",
-				_ => throw new Exception("Unknown game version, not in {stable, preview, dev}")
+				_ => throw new Exception("How")
 			},
 			"Mods\\");
 

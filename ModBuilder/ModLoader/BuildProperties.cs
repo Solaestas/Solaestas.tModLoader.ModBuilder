@@ -292,17 +292,11 @@ public class BuildProperties
 		return data;
 	}
 
-	public struct ModReference
+	public struct ModReference(string mod, Version target)
 	{
-		public string Mod;
+		public string Mod = mod;
 
-		public Version Target;
-
-		public ModReference(string mod, Version target)
-		{
-			Mod = mod;
-			Target = target;
-		}
+		public Version Target = target;
 
 		public static ModReference Parse(string spec)
 		{
@@ -327,7 +321,7 @@ public class BuildProperties
 			}
 		}
 
-		public override string ToString()
+		public override readonly string ToString()
 		{
 			return Target == null ? Mod : Mod + '@' + Target;
 		}
