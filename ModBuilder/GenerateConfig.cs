@@ -47,10 +47,9 @@ public class GenerateConfig : Task
 
 		GameVersion version = identifier.Contains("dev") ? GameVersion.Developer
 			: identifier.Contains("preview") ? GameVersion.Preview
-			: identifier.Contains("stable") ? GameVersion.Stable
-			: throw new Exception("Unknown game version, not in {stable, preview, dev}");
+			: GameVersion.Stable;
 
-		Log.LogMessage(MessageImportance.High, "Detect tModLoader Version: {0}", version.ToString());
+		Log.LogMessage(MessageImportance.High, "tModLoader Version: {0}", version.ToString());
 
 		ModDirectory = Path.Combine(
 			Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
@@ -58,10 +57,10 @@ public class GenerateConfig : Task
 			"Terraria",
 			version switch
 			{
-				GameVersion.Stable => "tModLoader",
+				GameVersion.Stable => "tModLoader-1.4.3",
 				GameVersion.Preview => "tModLoader-preview",
 				GameVersion.Developer => "tModLoader-dev",
-				_ => throw new Exception("How")
+				_ => throw new Exception("How to get here?")
 			},
 			"Mods\\");
 
