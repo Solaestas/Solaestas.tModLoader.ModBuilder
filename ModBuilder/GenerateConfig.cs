@@ -47,7 +47,8 @@ public class GenerateConfig : Task
 
 		GameVersion version = identifier.Contains("dev") ? GameVersion.Developer
 			: identifier.Contains("preview") ? GameVersion.Preview
-			: GameVersion.Stable;
+			: identifier.Contains("stable") ? GameVersion.Stable
+			: GameVersion.Legacy;
 
 		Log.LogMessage(MessageImportance.High, "tModLoader Version: {0}", version.ToString());
 
@@ -57,7 +58,8 @@ public class GenerateConfig : Task
 			"Terraria",
 			version switch
 			{
-				GameVersion.Stable => "tModLoader-1.4.3",
+				GameVersion.Legacy => "tModLoader-1.4.3",
+				GameVersion.Stable => "tModLoader",
 				GameVersion.Preview => "tModLoader-preview",
 				GameVersion.Developer => "tModLoader-dev",
 				_ => throw new Exception("How to get here?")

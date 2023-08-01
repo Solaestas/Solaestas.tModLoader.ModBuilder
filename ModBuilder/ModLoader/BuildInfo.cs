@@ -43,7 +43,7 @@ public class BuildInfo
 	public BuildInfo(BuildConfig config)
 	{
 		BuildIdentifier = config.BuildIdentifier;
-		if (config.Version == GameVersion.Stable)
+		if (config.Version == GameVersion.Legacy)
 		{
 			string[] array = BuildIdentifier[(BuildIdentifier.IndexOf('+') + 1)..].Split('|');
 			int i = 0;
