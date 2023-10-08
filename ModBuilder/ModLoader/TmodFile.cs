@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Concurrent;
 using System.IO.Compression;
 using System.Security.Cryptography;
 
@@ -39,7 +40,7 @@ public class TmodFile(string path, string name, Version version) : IEnumerable<T
 
 	private FileStream fileStream;
 
-	internal IDictionary<string, FileEntry> files = new Dictionary<string, FileEntry>();
+	public IDictionary<string, FileEntry> files = new ConcurrentDictionary<string, FileEntry>();
 
 	private FileEntry[] fileTable;
 

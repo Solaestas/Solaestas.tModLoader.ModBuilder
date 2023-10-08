@@ -23,6 +23,7 @@
 		<!--附加功能配置-->
 		<Solaestas-WhitelistMod Condition="'$(Solaestas-WhitelistMod)' == ''">herosmod;cheatsheet;dragonlen</Solaestas-WhitelistMod>
 		<Solaestas-BuildIgnore Condition="'$(Solaestas-BuildIgnore)' == ''">true</Solaestas-BuildIgnore>
+		<NoWarn>$(NoWarn);CS0436</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -31,7 +32,6 @@
 		<Solaestas-ImageFile Include="**/*.png" Exclude="bin/**/*;obj/**/*" />
 		<Solaestas-ImageFile Remove="icon.png" />
 		<Solaestas-HjsonFile Include="**/*.hjson" Exclude="bin/**/*;obj/**/*" />
-		<Solaestas-JsonFile Include="**/*.json" Exclude="bin/**/*;obj/**/*;Properties/**/*" />
 		<Solaestas-TextFile Include="**/*.txt" Exclude="bin/**/*;obj/**/*" />
 		<Solaestas-TextFile Remove="build.txt" />
 		<Solaestas-TextFile Remove="description.txt" />
@@ -49,7 +49,7 @@
 	</ItemGroup>
 
 	<ItemGroup Condition="$(Solaestas-UsePublicizer)">
-		<PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.0"
+		<PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1"
 			ExcludeAssets="runtime" />
 		<Publicize Include="tModLoader" />
 	</ItemGroup>

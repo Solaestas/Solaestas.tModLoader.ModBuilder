@@ -5,13 +5,6 @@ using Solaestas.tModLoader.ModBuilder.ModLoader;
 
 namespace Solaestas.tModLoader.ModBuilder;
 
-public enum ResourceStyle
-{
-	Blacklist,
-
-	Whitelist,
-}
-
 public class BuildMod : Microsoft.Build.Utilities.Task
 {
 	/// <summary>
@@ -36,11 +29,6 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 	/// 模组名，默认为文件夹名 <br /> 模组名应该与ILoadable的命名空间和程序集名称相同
 	/// </summary>
 	public string ModName { get; set; }
-
-	/// <summary>
-	/// Debug or Release, 决定是否包含PDB
-	/// </summary>
-	public string Configuration { get; set; }
 
 	/// <summary>
 	/// 无预处理的资源文件，直接从源码中复制
@@ -85,19 +73,16 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 		var dllref = new HashSet<string>(property.DllReferences);
 		var modref = new HashSet<string>(property.ModReferences.Select(mod => mod.Mod));
 
-		tmod.files = new Dictionary<string, TmodFile.FileEntry>();
-
 		// Add Assets
-		foreach (var file in AssetFiles)
+		Parallel.ForEach(AssetFiles, file =>
 		{
 			var identity = file.ItemSpec[prefixLength..];
 			if (property.IgnoreFile(identity))
 			{
-				continue;
+				return;
 			}
 			bool compressed = tmod.AddFile(identity, file.ItemSpec);
-			Log.LogMessage(MessageImportance.Low, "Add {2}Asset: {0} -> {1}", file.ItemSpec, identity, compressed ? "Compressed " : string.Empty);
-		}
+		});
 
 		prefixLength = ModSourceDirectory.Length;
 
@@ -106,20 +91,19 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 		{
 			Log.LogMessage(MessageImportance.Normal, "Read BuildIgnore from build.txt");
 			var files = Directory.EnumerateFiles(ModSourceDirectory, "*", SearchOption.AllDirectories);
-			foreach (var file in files)
+			Parallel.ForEach(files, file =>
 			{
 				var identity = file[prefixLength..];
 				if (!property.IgnoreFile(identity) && !IgnoreFile(identity, property))
 				{
 					bool compressed = tmod.AddFile(identity, file);
-					Log.LogMessage(MessageImportance.Low, "Add {2}Resource: {0} -> {1}", file, identity, compressed ? "Compressed " : string.Empty);
 				}
-			}
+			});
 		}
 		else
 		{
 			Log.LogMessage(MessageImportance.Normal, "Read resources from MSBuild");
-			foreach (var file in ResourceFiles)
+			Parallel.ForEach(ResourceFiles, file =>
 			{
 				var identity = file.GetMetadata("Path");
 				if (string.IsNullOrEmpty(identity))
@@ -127,8 +111,7 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 					identity = file.GetMetadata("Identity");
 				}
 				bool compressed = tmod.AddFile(identity, file.ItemSpec);
-				Log.LogMessage(MessageImportance.Low, "Add {2}Resource: {0} -> {1}", file, identity, compressed ? "Compressed " : string.Empty);
-			}
+			});
 		}
 
 		// Add dll
@@ -138,7 +121,6 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 
 			if (name == ModName)
 			{
-				Log.LogMessage(MessageImportance.Low, "Add dll: {0}", file);
 				tmod.AddFile($"{name}.dll", file);
 				continue;
 			}
@@ -153,7 +135,6 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 				dllref.Add(name);
 			}
 
-			Log.LogMessage(MessageImportance.Low, "Add lib: {0} -> {1}", file, name);
 			tmod.AddFile($"lib\\{name}.dll", file);
 		}
 
@@ -161,13 +142,12 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 		var pdbPath = Path.Combine(OutputDirectory, $"{ModName}.pdb");
 		if (File.Exists(pdbPath))
 		{
-			Log.LogMessage(MessageImportance.Low, "Add pdb: {0}", pdbPath);
 			tmod.AddFile($"{ModName}.pdb", pdbPath);
 			property.EacPath = pdbPath;
 		}
 
 		// Add Info
-		property.DllReferences = dllref.ToArray();
+		property.DllReferences = [.. dllref];
 		tmod.AddFile("Info", property.ToBytes());
 
 		tmod.Save(info);
