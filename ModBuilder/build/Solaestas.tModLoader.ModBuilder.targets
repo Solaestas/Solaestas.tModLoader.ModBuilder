@@ -47,7 +47,7 @@
 		Outputs="$(Solaestas-ModDirectory)$(AssemblyName).tmod">
 		<BuildMod Condition="$(Solaestas-NotMod) != true" ModSourceDirectory="$(MSBuildProjectDirectory)\" ModName="$(AssemblyName)"
 			OutputDirectory="$(OutputPath)" ModDirectory="$(Solaestas-ModDirectory)"
-			Configuration="$(Solaestas-Configuration)" AssetFiles="@(Solaestas-AssetFile);"
+			AssetFiles="@(Solaestas-AssetFile);"
 			ResourceFiles="@(Solaestas-ResourceFile)" ConfigPath="$(Solaestas-ConfigPath)" 
 			BuildIgnore="$(Solaestas-BuildIgnore)"/>
 	</Target>

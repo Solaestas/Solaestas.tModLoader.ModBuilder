@@ -17,13 +17,13 @@
 		<Solaestas-ShaderBuilderDirectory>$(MSBuildThisFileDirectory)../tools/</Solaestas-ShaderBuilderDirectory>
 		<!--附加功能开关-->
 		<Solaestas-UseAssetPath Condition="'$(Solaestas-UseAssetPath)' == ''">true</Solaestas-UseAssetPath>
-		<Solaestas-UsePublicizer Condition="'$(Solaestas-UsePublicizer)' == ''">true</Solaestas-UsePublicizer>
 		<Solaestas-UseMinimalMod Condition="'$(Solaestas-UseMinimalMod)' == ''">false</Solaestas-UseMinimalMod>
 		<Solaestas-NotMod Condition="'$(Solaestas-NotMod)' == ''">false</Solaestas-NotMod>
 		<!--附加功能配置-->
 		<Solaestas-WhitelistMod Condition="'$(Solaestas-WhitelistMod)' == ''">herosmod;cheatsheet;dragonlen</Solaestas-WhitelistMod>
 		<Solaestas-BuildIgnore Condition="'$(Solaestas-BuildIgnore)' == ''">true</Solaestas-BuildIgnore>
 		<NoWarn>$(NoWarn);CS0436</NoWarn>
+		<PublicizerClearCacheOnClean>true</PublicizerClearCacheOnClean>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -46,12 +46,10 @@
 		<Solaestas-ModFile Condition="Exists('build.txt')" Include="build.txt" />
 		<Solaestas-ModFile Condition="Exists('description.txt')" Include="description.txt" />
 		<AvailableItemName Include="Solaestas-ModFile;Solaestas-ResourceFile;Solaestas-EffectFile;Solaestas-ImageFile" />
-	</ItemGroup>
-
-	<ItemGroup Condition="$(Solaestas-UsePublicizer)">
-		<PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1"
-			ExcludeAssets="runtime" />
-		<Publicize Include="tModLoader" />
+		<Publicize Include="tModLoader;FNA">
+			<IncludeCompilerGeneratedMembers>false</IncludeCompilerGeneratedMembers>
+			<IncludeVirtualMembers>false</IncludeVirtualMembers>
+		</Publicize>
 	</ItemGroup>
 
 	<ItemGroup Condition="$(Solaestas-UseAssetPath)">
