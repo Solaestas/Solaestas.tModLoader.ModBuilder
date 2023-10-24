@@ -47,8 +47,9 @@
 		<Solaestas-ModFile Condition="Exists('description.txt')" Include="description.txt" />
 		<AvailableItemName Include="Solaestas-ModFile;Solaestas-ResourceFile;Solaestas-EffectFile;Solaestas-ImageFile" />
 		<Publicize Include="tModLoader;FNA">
-			<IncludeCompilerGeneratedMembers>false</IncludeCompilerGeneratedMembers>
-			<IncludeVirtualMembers>false</IncludeVirtualMembers>
+			<!--Krafs.Publicizer-->
+			<!--<IncludeCompilerGeneratedMembers>false</IncludeCompilerGeneratedMembers>-->
+			<!--<IncludeVirtualMembers>false</IncludeVirtualMembers>-->
 		</Publicize>
 	</ItemGroup>
 
