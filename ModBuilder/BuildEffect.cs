@@ -1,6 +1,6 @@
-using System.Diagnostics;
 using CliWrap;
 using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
 using Newtonsoft.Json;
 using ShaderBuilder;
 using Task = Microsoft.Build.Utilities.Task;
@@ -13,7 +13,7 @@ public class BuildEffect : Task
 	/// 输入文件
 	/// </summary>
 	[Required]
-	public string InputFiles { get; set; }
+	public ITaskItem[] InputFiles { get; set; }
 
 	/// <summary>
 	/// 中间文件夹
@@ -38,13 +38,18 @@ public class BuildEffect : Task
 	/// </summary>
 	public string TargetPlatform { get; set; }
 
-	/// <summary> Support Profile : HiDef, Reach <br> And I don't know what they mean </summary>
+	/// <summary>
+	/// Support Profile : HiDef, Reach <br /> And I don't know what they mean
+	/// </summary>
 	public string TargetProfile { get; set; }
 
 	/// <summary>
 	/// Configuration
 	/// </summary>
 	public string BuildConfiguration { get; set; }
+
+	[Output]
+	public TaskItem[] EffectOutputs { get; set; }
 
 	public override bool Execute()
 	{
@@ -53,7 +58,7 @@ public class BuildEffect : Task
 		var filename = $"{BuilderDirectory}ShaderBuilder.exe";
 		var args = new List<string>()
 		{
-			InputFiles,
+			string.Join(";", InputFiles.Select(i => i.ItemSpec)),
 			IntermediateDirectory,
 			OutputDirectory,
 			TargetPlatform,
@@ -80,6 +85,7 @@ public class BuildEffect : Task
 			}
 		});
 		cli.ExecuteAsync().Task.Wait();
+
 		return success;
 	}
 }

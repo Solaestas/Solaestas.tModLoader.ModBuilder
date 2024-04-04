@@ -1,14 +1,15 @@
-﻿<Project>
-	<Import Condition="Exists('$(MSBuildProjectDirectory)../../tModLoader.targets') And $(tMLPath) == ''"
-		Project="$(MSBuildProjectDirectory)../../tModLoader.targets" />
-	<Import Condition="Exists('$(MSBuildProjectDirectory)../../../tModLoader.targets') And $(tMLPath) == ''"
-		Project="$(MSBuildProjectDirectory)../../../tModLoader.targets" />
+<Project>
+	<Import Condition="Exists('$(MSBuildProjectDirectory)/../../tModLoader.targets') And $(tMLPath) == ''"
+			Project="$(MSBuildProjectDirectory)/../../tModLoader.targets" />
+	<Import Condition="Exists('$(MSBuildProjectDirectory)/../../../tModLoader.targets') And $(tMLPath) == ''"
+			Project="$(MSBuildProjectDirectory)/../../../tModLoader.targets" />
 	<Import Condition="Exists('$(MSBuildProjectDirectory)../../../../tModLoader.targets') And $(tMLPath) == ''"
-		Project="$(MSBuildProjectDirectory)../../../../tModLoader.targets" />
+			Project="$(MSBuildProjectDirectory)/../../../../tModLoader.targets" />
 
 	<PropertyGroup>
-		<!--消除架构警告-->
+		<!--消除警告-->
 		<ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+		<NoWarn>$(NoWarn);CS0436</NoWarn>
 		<!--复制包里面的程序集到输出目录-->
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<!--相关路径-->
@@ -18,44 +19,34 @@
 		<!--附加功能开关-->
 		<Solaestas-UseAssetPath Condition="'$(Solaestas-UseAssetPath)' == ''">true</Solaestas-UseAssetPath>
 		<Solaestas-UseMinimalMod Condition="'$(Solaestas-UseMinimalMod)' == ''">false</Solaestas-UseMinimalMod>
-		<Solaestas-NotMod Condition="'$(Solaestas-NotMod)' == ''">false</Solaestas-NotMod>
 		<!--附加功能配置-->
 		<Solaestas-WhitelistMod Condition="'$(Solaestas-WhitelistMod)' == ''">herosmod;cheatsheet;dragonlen</Solaestas-WhitelistMod>
 		<Solaestas-BuildIgnore Condition="'$(Solaestas-BuildIgnore)' == ''">true</Solaestas-BuildIgnore>
-		<NoWarn>$(NoWarn);CS0436</NoWarn>
-		<PublicizerClearCacheOnClean>true</PublicizerClearCacheOnClean>
+		<!--是否启用-->
+		<EnableModBuilder Condition="$(OutputType) == 'Library'">true</EnableModBuilder>
 	</PropertyGroup>
 
 	<ItemGroup>
+		<!--Shader代码-->
+		<ModEffect Include="**/*.fx"
+				   Exclude="bin/**/*;obj/**/*" />
 		<!--资源文件-->
-		<Solaestas-EffectFile Include="**/*.fx" Exclude="bin/**/*;obj/**/*" />
-		<Solaestas-ImageFile Include="**/*.png" Exclude="bin/**/*;obj/**/*" />
-		<Solaestas-ImageFile Remove="icon.png" />
-		<Solaestas-HjsonFile Include="**/*.hjson" Exclude="bin/**/*;obj/**/*" />
-		<Solaestas-TextFile Include="**/*.txt" Exclude="bin/**/*;obj/**/*" />
-		<Solaestas-TextFile Remove="build.txt" />
-		<Solaestas-TextFile Remove="description.txt" />
-		<Solaestas-MusicFile Include="**/*.ogg" />
-		<Solaestas-MusicFile Include="**/*.wav" />
-		<Solaestas-MusicFile Include="**/*.mp3" />
-		<Solaestas-ResourceFile Include="@(Solaestas-HjsonFile)" />
-		<Solaestas-ResourceFile Include="@(Solaestas-JsonFile)" />
-		<Solaestas-ResourceFile Include="@(Solaestas-TextFile)" />
-		<Solaestas-ResourceFile Include="@(Solaestas-MusicFile)" />
-		<Solaestas-ResourceFile Condition="Exists('icon.png')" Include="icon.png" />
-		<Solaestas-ModFile Condition="Exists('build.txt')" Include="build.txt" />
-		<Solaestas-ModFile Condition="Exists('description.txt')" Include="description.txt" />
-		<AvailableItemName Include="Solaestas-ModFile;Solaestas-ResourceFile;Solaestas-EffectFile;Solaestas-ImageFile" />
-		<Publicize Include="tModLoader;FNA">
-			<!--Krafs.Publicizer-->
-			<!--<IncludeCompilerGeneratedMembers>false</IncludeCompilerGeneratedMembers>-->
-			<!--<IncludeVirtualMembers>false</IncludeVirtualMembers>-->
-		</Publicize>
+		<ModResource Include="**/*.hjson;**/*.txt;**/*.ogg;**/*.wav;**/*.mp3;"
+					 Exclude="bin/**/*;obj/**/*" />
+		<!--Mod信息-->
+		<ModInfo Condition="Exists('build.txt')"
+				 Include="build.txt" />
+		<ModInfo Condition="Exists('description.txt')"
+				 Include="description.txt" />
+		<!--默认Publicizer-->
+		<Publicize Include="tModLoader;FNA" />
 	</ItemGroup>
 
 	<ItemGroup Condition="$(Solaestas-UseAssetPath)">
 		<!--VS会显示Visible为false的文件的所在文件夹，加一个Link修改显示位置-->
-		<Compile Include="$(BaseIntermediateOutputPath)ModAsset.g.cs" Visible="false" AutoGen="true"
-			Link="%(Filename)%(Extension)" />
+		<Compile Include="$(BaseIntermediateOutputPath)ModAsset.g.cs"
+				 Visible="false"
+				 AutoGen="true"
+				 Link="%(Filename)%(Extension)" />
 	</ItemGroup>
 </Project>

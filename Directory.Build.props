@@ -7,6 +7,6 @@
 		<IsPackable>false</IsPackable>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="PolySharp" Version="1.13.2" PrivateAssets="all" />
+		<PackageReference Include="PolySharp" Version="1.14.1" PrivateAssets="all" />
 	</ItemGroup>
 </Project>

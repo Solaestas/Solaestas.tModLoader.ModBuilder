@@ -60,18 +60,6 @@ public class TmodFile(string path, string name, Version version) : IEnumerable<T
 		using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
 		int size = (int)stream.Length;
 
-		// 图片优化
-		if (System.IO.Path.GetExtension(filePath) == ".rawimg")
-		{
-			var imgData = new byte[size - sizeof(int)];
-			var sizeBytes = new byte[4];
-			stream.Read(sizeBytes, 0, 4);
-			stream.Read(imgData, 0, size - sizeof(int));
-			size = BitConverter.ToInt32(sizeBytes, 0);
-			files[fileName] = new FileEntry(fileName, -1, size, imgData.Length, imgData);
-			return size != imgData.Length;
-		}
-
 		var data = new byte[size];
 		stream.Read(data, 0, size);
 		if (size > MIN_COMPRESS_SIZE && ShouldCompress(fileName))
@@ -95,7 +83,7 @@ public class TmodFile(string path, string name, Version version) : IEnumerable<T
 	private bool ShouldCompress(string fileName)
 	{
 		var ext = System.IO.Path.GetExtension(fileName);
-		return ext is not ".png" and not ".mp3" and not ".ogg" and not ".rawimg";
+		return ext is not ".png" and not ".mp3" and not ".ogg";
 	}
 
 	public void AddFile(string fileName, byte[] data)

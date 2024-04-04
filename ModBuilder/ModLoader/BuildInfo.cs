@@ -40,10 +40,10 @@ public class BuildInfo
 
 	public string VersionedNameDevFriendly;
 
-	public BuildInfo(BuildConfig config)
+	public BuildInfo(string buildIdentifier, TmlVersoin version)
 	{
-		BuildIdentifier = config.BuildIdentifier;
-		if (config.Version == GameVersion.Legacy)
+		BuildIdentifier = buildIdentifier;
+		if (version == TmlVersoin.Legacy)
 		{
 			string[] array = BuildIdentifier[(BuildIdentifier.IndexOf('+') + 1)..].Split('|');
 			int i = 0;

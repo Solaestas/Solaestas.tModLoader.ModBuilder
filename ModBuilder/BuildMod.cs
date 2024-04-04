@@ -20,12 +20,6 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 	public string OutputDirectory { get; set; }
 
 	/// <summary>
-	/// 模组文件夹文件夹
-	/// </summary>
-	[Required]
-	public string ModDirectory { get; set; }
-
-	/// <summary>
 	/// 模组名，默认为文件夹名 <br /> 模组名应该与ILoadable的命名空间和程序集名称相同
 	/// </summary>
 	public string ModName { get; set; }
@@ -36,83 +30,43 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 	[Required]
 	public ITaskItem[] ResourceFiles { get; set; }
 
-	/// <summary>
-	/// 需要经过预处理的特殊资源文件
-	/// </summary>
 	[Required]
-	public ITaskItem[] AssetFiles { get; set; }
-
-	/// <summary>
-	/// 是否使用BuildIgnore来决定是否包含资源
-	/// </summary>
-	[Required]
-	public bool BuildIgnore { get; set; }
+	public string ModDirectory { get; set; }
 
 	[Required]
-	public string ConfigPath { get; set; }
+	public string TmlVersion { get; set; }
+
+	[Required]
+	public string BuildIdentifier { get; set; }
 
 	public override bool Execute()
 	{
-		var config = JsonConvert.DeserializeObject<BuildConfig>(File.ReadAllText(ConfigPath)) ?? throw new Exception("Build Config not found");
-		var info = new BuildInfo(config);
+		_ = Enum.TryParse<TmlVersoin>(TmlVersion, out var tmlVersion);
+		var info = new BuildInfo(BuildIdentifier, tmlVersion);
 		Log.LogMessage(MessageImportance.High, $"Building {ModName} -> {Path.Combine(ModDirectory, $"{ModName}.tmod")}");
 		var sw = Stopwatch.StartNew();
 
 		var property = BuildProperties.ReadBuildFile(ModSourceDirectory, info);
 		var tmod = new TmodFile(Path.Combine(ModDirectory, $"{ModName}.tmod"), ModName, property.Version);
 
-		var assetDirectory = Path.Combine(OutputDirectory, "Assets") + Path.DirectorySeparatorChar;
 		Log.LogMessage(MessageImportance.Normal, "Source Path: {0}", ModSourceDirectory);
 		Log.LogMessage(MessageImportance.Normal, "Output Path: {0}", OutputDirectory);
-		Log.LogMessage(MessageImportance.Normal, "Asset Path: {0}", assetDirectory);
-
-		// Asset路径前缀长度
-		var prefixLength = assetDirectory.Length;
 
 		// Add dll and pdb
 		var dllref = new HashSet<string>(property.DllReferences);
 		var modref = new HashSet<string>(property.ModReferences.Select(mod => mod.Mod));
 
-		// Add Assets
-		Parallel.ForEach(AssetFiles, file =>
+		// Add Resources
+		Log.LogMessage(MessageImportance.Normal, "Read resources from MSBuild");
+		Parallel.ForEach(ResourceFiles, file =>
 		{
-			var identity = file.ItemSpec[prefixLength..];
-			if (property.IgnoreFile(identity))
+			var identity = file.GetMetadata("PathOverride");
+			if (string.IsNullOrEmpty(identity))
 			{
-				return;
+				identity = file.GetMetadata("Identity");
 			}
 			bool compressed = tmod.AddFile(identity, file.ItemSpec);
 		});
-
-		prefixLength = ModSourceDirectory.Length;
-
-		// Add Resources
-		if (BuildIgnore)
-		{
-			Log.LogMessage(MessageImportance.Normal, "Read BuildIgnore from build.txt");
-			var files = Directory.EnumerateFiles(ModSourceDirectory, "*", SearchOption.AllDirectories);
-			Parallel.ForEach(files, file =>
-			{
-				var identity = file[prefixLength..];
-				if (!property.IgnoreFile(identity) && !IgnoreFile(identity, property))
-				{
-					bool compressed = tmod.AddFile(identity, file);
-				}
-			});
-		}
-		else
-		{
-			Log.LogMessage(MessageImportance.Normal, "Read resources from MSBuild");
-			Parallel.ForEach(ResourceFiles, file =>
-			{
-				var identity = file.GetMetadata("Path");
-				if (string.IsNullOrEmpty(identity))
-				{
-					identity = file.GetMetadata("Identity");
-				}
-				bool compressed = tmod.AddFile(identity, file.ItemSpec);
-			});
-		}
 
 		// Add dll
 		foreach (var file in Directory.EnumerateFiles(OutputDirectory, "*.dll", SearchOption.TopDirectoryOnly))

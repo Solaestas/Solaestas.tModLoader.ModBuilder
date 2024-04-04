@@ -18,7 +18,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShaderBuilder", "ShaderBuil
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestMod", "TestMod\TestMod.csproj", "{799D527D-37A7-4190-A4FA-9EFA14BB61A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProject", "TestProject\TestProject.csproj", "{4B2BC328-8787-429C-99F0-428BD3D50F7B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestProject", "TestProject\TestProject.csproj", "{4B2BC328-8787-429C-99F0-428BD3D50F7B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocalTestMod", "LocalTestMod\LocalTestMod.csproj", "{6F1907E7-4728-47C8-A372-05B15C6EEA6A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,6 +44,10 @@ Global
 		{4B2BC328-8787-429C-99F0-428BD3D50F7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4B2BC328-8787-429C-99F0-428BD3D50F7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4B2BC328-8787-429C-99F0-428BD3D50F7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F1907E7-4728-47C8-A372-05B15C6EEA6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F1907E7-4728-47C8-A372-05B15C6EEA6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F1907E7-4728-47C8-A372-05B15C6EEA6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F1907E7-4728-47C8-A372-05B15C6EEA6A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

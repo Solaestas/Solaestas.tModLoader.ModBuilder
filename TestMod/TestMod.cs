@@ -1,5 +1,3 @@
-using Microsoft.Xna.Framework.Graphics;
-using Terraria;
 using Terraria.ModLoader;
 
 namespace TestMod;

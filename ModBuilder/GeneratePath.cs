@@ -93,7 +93,7 @@ public class GeneratePath : Task
 
 		// Save Cache
 		using var writer = File.CreateText(cachePath);
-		foreach(var file in AssetFiles)
+		foreach (var file in AssetFiles)
 		{
 			writer.WriteLine(file.ItemSpec);
 		}

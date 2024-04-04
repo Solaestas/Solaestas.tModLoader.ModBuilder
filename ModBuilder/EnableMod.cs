@@ -1,7 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Task = Microsoft.Build.Utilities.Task;
@@ -16,33 +14,25 @@ public class EnableMod : Task
 	/// <summary>
 	/// 用于调试Mod的工具Mod，如Hero，CheatSheet，用;分开.
 	/// </summary>
-	public required string WhitelistMod { get; set; }
+	public required string DebugMod { get; set; }
 
 	/// <summary>
 	/// 是否禁用其他Mod.
 	/// </summary>
 	public bool MinimalMod { get; set; }
 
-	/// <summary>
-	/// 配置文件路径
-	/// </summary>
 	[Required]
-	public required string ConfigPath { get; set; }
-
+	public string ModDirectory { get; set; }
 	public override bool Execute()
 	{
-		var config = JsonConvert.DeserializeObject<BuildConfig>(File.ReadAllText(ConfigPath)) ?? throw new Exception("Build Config not found");
-
-		var path = Path.Combine(config.ModDirectory, "enabled.json");
-		var json = File.Exists(path) ? JArray.Parse(File.ReadAllText(path)) : new JArray();
+		var path = Path.Combine(ModDirectory, "enabled.json");
+		var json = File.Exists(path) ? JArray.Parse(File.ReadAllText(path)) : [];
 
 		using var writer = File.CreateText(path);
+		using var jsonWriter = new JsonTextWriter(writer);
 		if (MinimalMod)
 		{
-			json = new JArray(new List<string>(WhitelistMod.Split(';'))
-			{
-				BuildingMod,
-			}.ToArray());
+			json = [.. DebugMod.Split(';'), BuildingMod];
 		}
 		else
 		{
@@ -51,14 +41,11 @@ public class EnableMod : Task
 				json.Add(BuildingMod);
 			}
 
-			if (WhitelistMod != null)
+			foreach (var mod in DebugMod.Split(';'))
 			{
-				foreach (var mod in WhitelistMod)
+				if (!json.Contains(mod))
 				{
-					if (!json.Contains(mod))
-					{
-						json.Add(mod);
-					}
+					json.Add(mod);
 				}
 			}
 		}

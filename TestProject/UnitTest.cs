@@ -1,4 +1,3 @@
-using System.Configuration;
 using Microsoft.Build.Utilities;
 using Solaestas.tModLoader.ModBuilder;
 
