@@ -43,11 +43,12 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 	{
 		_ = Enum.TryParse<TmlVersoin>(TmlVersion, out var tmlVersion);
 		var info = new BuildInfo(BuildIdentifier, tmlVersion);
-		Log.LogMessage(MessageImportance.High, $"Building {ModName} -> {Path.Combine(ModDirectory, $"{ModName}.tmod")}");
+		string modPath = Path.Combine(ModDirectory, $"{ModName}.tmod");
+		Log.LogMessage(MessageImportance.High, "Building {0} -> {1}", ModName, modPath);
 		var sw = Stopwatch.StartNew();
 
 		var property = BuildProperties.ReadBuildFile(ModSourceDirectory, info);
-		var tmod = new TmodFile(Path.Combine(ModDirectory, $"{ModName}.tmod"), ModName, property.Version);
+		var tmod = new TmodFile(modPath, ModName, property.Version);
 
 		Log.LogMessage(MessageImportance.Normal, "Source Path: {0}", ModSourceDirectory);
 		Log.LogMessage(MessageImportance.Normal, "Output Path: {0}", OutputDirectory);
@@ -57,7 +58,6 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 		var modref = new HashSet<string>(property.ModReferences.Select(mod => mod.Mod));
 
 		// Add Resources
-		Log.LogMessage(MessageImportance.Normal, "Read resources from MSBuild");
 		Parallel.ForEach(ResourceFiles, file =>
 		{
 			var identity = file.GetMetadata("PathOverride");
@@ -65,6 +65,7 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 			{
 				identity = file.GetMetadata("Identity");
 			}
+			Log.LogMessage(MessageImportance.Normal, "Add Resource: {0} -> {1}", identity, file.ItemSpec);
 			bool compressed = tmod.AddFile(identity, file.ItemSpec);
 		});
 
@@ -75,6 +76,7 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 
 			if (name == ModName)
 			{
+				Log.LogMessage(MessageImportance.Normal, "Add Assembly: {0} -> {1}", name, file);
 				tmod.AddFile($"{name}.dll", file);
 				continue;
 			}
@@ -89,6 +91,7 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 				dllref.Add(name);
 			}
 
+			Log.LogMessage(MessageImportance.Normal, "Add Reference: {0} -> {1}", name, file);
 			tmod.AddFile($"lib\\{name}.dll", file);
 		}
 

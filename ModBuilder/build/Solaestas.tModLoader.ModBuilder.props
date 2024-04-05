@@ -17,11 +17,13 @@
 		<Solaestas-TaskPath>$(MSBuildThisFileDirectory)Solaestas.tModLoader.ModBuilder.dll</Solaestas-TaskPath>
 		<Solaestas-ShaderBuilderDirectory>$(MSBuildThisFileDirectory)../tools/</Solaestas-ShaderBuilderDirectory>
 		<!--附加功能开关-->
-		<Solaestas-UseAssetPath Condition="'$(Solaestas-UseAssetPath)' == ''">true</Solaestas-UseAssetPath>
-		<Solaestas-UseMinimalMod Condition="'$(Solaestas-UseMinimalMod)' == ''">false</Solaestas-UseMinimalMod>
+		<EnablePathGenerator>true</EnablePathGenerator>
+		<AutoDisableMod>false</AutoDisableMod>
 		<!--附加功能配置-->
-		<Solaestas-WhitelistMod Condition="'$(Solaestas-WhitelistMod)' == ''">herosmod;cheatsheet;dragonlen</Solaestas-WhitelistMod>
-		<Solaestas-BuildIgnore Condition="'$(Solaestas-BuildIgnore)' == ''">true</Solaestas-BuildIgnore>
+		<DebugMod>herosmod;cheatsheet;dragonlen</DebugMod>
+		<PathNamespace>$(RootNamespace)</PathNamespace>
+		<PathTypeName>ModAsset</PathTypeName>
+		<PathPrefix></PathPrefix>
 		<!--是否启用-->
 		<EnableModBuilder Condition="$(OutputType) == 'Library'">true</EnableModBuilder>
 	</PropertyGroup>
@@ -42,7 +44,7 @@
 		<Publicize Include="tModLoader;FNA" />
 	</ItemGroup>
 
-	<ItemGroup Condition="$(Solaestas-UseAssetPath)">
+	<ItemGroup Condition="$(EnablePathGenerator)">
 		<!--VS会显示Visible为false的文件的所在文件夹，加一个Link修改显示位置-->
 		<Compile Include="$(BaseIntermediateOutputPath)ModAsset.g.cs"
 				 Visible="false"

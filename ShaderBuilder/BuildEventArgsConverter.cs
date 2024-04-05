@@ -51,7 +51,7 @@ public class BuildEventArgsConverter : JsonConverter<BuildEventArgs>
 				obj[nameof(BuildMessageEventArgs.Message)].Value<string>(),
 				obj[nameof(BuildMessageEventArgs.HelpKeyword)].Value<string>(),
 				obj[nameof(BuildMessageEventArgs.SenderName)].Value<string>(),
-				MessageImportance.Low,
+				MessageImportance.Normal,
 				obj[nameof(BuildMessageEventArgs.Timestamp)].ToObject<DateTime>()),
 			_ => throw new NotImplementedException(),
 		};

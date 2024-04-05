@@ -21,7 +21,7 @@
 	<Target Name="InitModBuilder"
 			BeforeTargets="ResolveLockFileReferences"
 			Condition="$(EnableModBuilder)">
-		<!--阻止tML程序集复制到输出目录-->
+		<!--读取配置文件-->
 		<ReadConfig ConfigPath="$(Solaestas-ConfigPath)">
 			<Output TaskParameter="ModDirectory"
 					PropertyName="ModDirectory" />
@@ -33,6 +33,7 @@
 		<PropertyGroup>
 			<ModOutput>$(ModDirectory)$(AssemblyName).tmod</ModOutput>
 		</PropertyGroup>
+		<!--阻止tML程序集复制到输出目录-->
 		<ItemGroup>
 			<Reference Update="$(tMLLibraryPath)/**/*.dll;$(tMLSteamPath)$(tMLPath)"
 					   Private="false" />
@@ -40,8 +41,10 @@
 				<PathOverride>%(Identity)</PathOverride>
 			</EffectOutputs>
 
-			<UpToDateCheckInput Include="@(ModEffect)" Set="Effects" />
-			<UpToDateCheckOutput Include="@(EffectOutputs)" Set="Effects" />
+			<UpToDateCheckInput Include="@(ModEffect)"
+								Set="Effects" />
+			<UpToDateCheckOutput Include="@(EffectOutputs)"
+								 Set="Effects" />
 			<UpToDateCheckBuilt Include="$(ModOutput)" />
 		</ItemGroup>
 	</Target>
@@ -72,11 +75,19 @@
 		</BuildEffect>
 	</Target>
 
+	<Target Name="ReadyToBuildMod"
+			Condition="$(EnableModBuilder)"
+			AfterTargets="Build">
+		<ItemGroup>
+			<CompileOutputs Include="$(OutputPath)*" />
+		</ItemGroup>
+	</Target>
+
 	<!--覆盖tML编译-->
 	<Target Name="BuildMod"
 			Condition="$(EnableModBuilder)"
-			AfterTargets="Build"
-			Inputs="$(Solaestas-ConfigPath);@(ModResource);$(OutputPath)*;@(EffectOutputs);@(ModInfo)"
+			AfterTargets="ReadyToBuildMod"
+			Inputs="$(Solaestas-ConfigPath);@(ModResource);@(CompileOutputs);@(EffectOutputs);@(ModInfo)"
 			Outputs="$(ModOutput)">
 		<BuildMod ModSourceDirectory="$(MSBuildProjectDirectory)\"
 				  ModName="$(AssemblyName)"
@@ -92,28 +103,26 @@
 			AfterTargets="Build">
 		<EnableMod BuildingMod="$(AssemblyName)"
 				   ModDirectory="$(ModDirectory)"
-				   MinimalMod="$(Solaestas-UseMinimalMod)"
-				   DebugMod="$(Solaestas-WhitelistMod)" />
+				   MinimalMod="$(AutoDisableMod)"
+				   DebugMod="$(DebugMod)" />
 	</Target>
 
 	<Target Name="Solaestas-GeneratePath"
 			BeforeTargets="BeforeCompile"
-			Condition="$(Solaestas-UseAssetPath)">
+			Condition="$(EnablePathGenerator)">
 		<PropertyGroup>
-			<Solaestas-AssetNamespace Condition="'$(Solaestas-AssetNamespace)' == ''">$(RootNamespace)</Solaestas-AssetNamespace>
-			<Solaestas-AssetClassName Condition="'$(Solaestas-AssetClassName)' == ''">ModAsset</Solaestas-AssetClassName>
 		</PropertyGroup>
 		<GeneratePath AssetFiles="@(ModEffect);@(ModResource)"
-					  ClassName="$(Solaestas-AssetClassName)"
-					  AssetPrefix="$(Solaestas-AssetPrefix)"
-					  Namespace="$(Solaestas-AssetNamespace)"
+					  ClassName="$(PathTypeName)"
+					  AssetPrefix="$(PathPrefix)"
+					  Namespace="$(PathNamespace)"
 					  OutputDirectory="$(BaseIntermediateOutputPath)" />
 	</Target>
 
 	<Target Name="Solaestas-CleanAsset"
 			BeforeTargets="Clean">
 		<RemoveDir Directories="$(IntermediateOutputPath)Assets" />
-		<Delete Condition="$(Solaestas-UseAssetPath)"
+		<Delete Condition="$(EnablePathGenerator)"
 				Files="$(BaseIntermediateOutputPath)ModPath.g.cs" />
 		<Delete Files="$(Solaestas-ConfigPath)" />
 		<Delete Files="@(EffectOutputs)" />
