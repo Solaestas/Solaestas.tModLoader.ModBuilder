@@ -12,10 +12,11 @@
 	<UsingTask TaskName="ReadConfig"
 			   AssemblyFile="$(Solaestas-TaskPath)" />
 
-	<Target Name="Solaestas-Test"
-			Condition="'$(tMLPath)' == ''"
-			BeforeTargets="Build">
-		<Error Text="tModLoader.targets not found" />
+	<Target Name="CheckImport"
+			BeforeTargets="InitModBuilder">
+		<Error Condition="'$(tMLPath)' == ''"
+			   Text="Missing tModLoader.targets. Please check its parent directory"
+			   ContinueOnError="false"/>
 	</Target>
 
 	<Target Name="InitModBuilder"
@@ -111,6 +112,7 @@
 			BeforeTargets="BeforeCompile"
 			Condition="$(EnablePathGenerator)">
 		<PropertyGroup>
+			<PathNamespace Condition="$(PathNamespace) == ''">$(RootNamespace)</PathNamespace>
 		</PropertyGroup>
 		<GeneratePath AssetFiles="@(ModEffect);@(ModResource)"
 					  ClassName="$(PathTypeName)"

@@ -30,8 +30,6 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<!--禁用Publicizer-->
-		<Solaestas-UsePublicizer>false</Solaestas-UsePublicizer>
 		<!--启用自动禁用其他Mod-->
 		<AutoDisableMod>true</AutoDisableMod>
 		<!--修改自动路径的类目-->

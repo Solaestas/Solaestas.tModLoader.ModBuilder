@@ -30,8 +30,6 @@ This is an example of TestMod.csproj.
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<!--Disable Publicizer-->
-		<Solaestas-UsePublicizer>false</Solaestas-UsePublicizer>
 		<!--Disable Other mod during building-->
 		<AutoDisableMod>true</AutoDisableMod>
 	</PropertyGroup>

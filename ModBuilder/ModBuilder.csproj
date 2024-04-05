@@ -17,7 +17,7 @@
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>tModLoader</PackageTags>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<Version>1.4.1</Version>
+		<Version>1.5</Version>
 		<IsPackable>true</IsPackable>
 	</PropertyGroup>
 
@@ -29,7 +29,7 @@
 		</PackageReference>
 		<PackageReference Include="SixLabors.ImageSharp" Version="2.1.7" PrivateAssets="all" />
 		<PackageReference Include="System.Reflection.MetadataLoadContext" Version="6.0.0" PrivateAssets="all" />
-		<PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="runtime;compile" />
+		<PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="runtime;compile" />
 		<Compile Include="../ShaderBuilder/BuildEventArgsConverter.cs" />
 		<None Include="build/*" Pack="true" PackagePath="/build/" />
 		<None Include="docs/*" Pack="true" PackagePath="/docs/" />

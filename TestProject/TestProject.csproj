@@ -4,7 +4,7 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-
+		<EnableModBuilder>false</EnableModBuilder>
 		<IsPackable>false</IsPackable>
 	</PropertyGroup>
 
@@ -18,15 +18,7 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.11.0" PrivateAssets="all" />
+		<PackageReference Include="Solaestas.tModLoader.ModBuilder" Version="1.5" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\ModBuilder\ModBuilder.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Update="Resources/*">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-	</ItemGroup>
 </Project>
