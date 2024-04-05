@@ -1,5 +1,5 @@
+using System.Collections.Immutable;
 using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Task = Microsoft.Build.Utilities.Task;
@@ -19,38 +19,29 @@ public class EnableMod : Task
 	/// <summary>
 	/// 是否禁用其他Mod.
 	/// </summary>
-	public bool MinimalMod { get; set; }
+	public bool AutoDisable { get; set; }
 
 	[Required]
 	public string ModDirectory { get; set; }
 	public override bool Execute()
 	{
 		var path = Path.Combine(ModDirectory, "enabled.json");
-		var json = File.Exists(path) ? JArray.Parse(File.ReadAllText(path)) : [];
+		var json = File.Exists(path) ? JsonConvert.DeserializeObject<HashSet<string>>(File.ReadAllText(path)): [];
 
-		using var writer = File.CreateText(path);
-		using var jsonWriter = new JsonTextWriter(writer);
-		if (MinimalMod)
+		var mods = DebugMod.Split(';');
+		Log.LogMessage(MessageImportance.High, "Enable Mod: {0}, {1}", BuildingMod, string.Join(", ", mods));
+		if (AutoDisable)
 		{
-			json = [.. DebugMod.Split(';'), BuildingMod];
+			Log.LogMessage(MessageImportance.High, "Auto Disable Other Mods");
+			json.Clear();
 		}
-		else
+		foreach(var mod in mods)
 		{
-			if (!json.Contains(BuildingMod))
-			{
-				json.Add(BuildingMod);
-			}
-
-			foreach (var mod in DebugMod.Split(';'))
-			{
-				if (!json.Contains(mod))
-				{
-					json.Add(mod);
-				}
-			}
+			json.Add(mod);
 		}
+		json.Add(BuildingMod);
 
-		json.WriteTo(new JsonTextWriter(writer));
+		File.WriteAllText(path, JsonConvert.SerializeObject(json));
 		return true;
 	}
 }

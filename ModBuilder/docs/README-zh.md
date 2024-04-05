@@ -49,14 +49,12 @@
 </Project>
 ```
 
-| Config Name               | Description                                                                                     | Default Value                   | Optional Values   |
-| ------------------------- | ----------------------------------------------------------------------------------------------- | ------------------------------- | ----------------- |
-| `EnablePathGenerator`  | 自动生成对资源路径的引用                                                                  | `true`                          | `true` or `false` |
-| `AutoDisableMod` | 自动禁用其他Mod                                         | `false`                         | `true` or `false` |
-| `EnableModBuilder`        | 为这个项目生成Mod文件                                                        | `true`                         | `true` or `false` |
-| `DebugMod`  | 自动启用指定Mod                                   | `herosmod;cheatsheet;dragonlen` | `[Mod Name]`      |
-| `PathPrefix`   | 自动路径的前缀                                                                            | `string.Empty`                  | `[string]`        |
-| `PathNamespace` | 自动路径的命名空间                                                                        | `$(RootNamespace)`                  | `[string]`        |
-| `PathTypeName` | 自动路径的类名                                                                        | `ModAsset`                  | `[string]`        |
-
-
+| Config Name           | Description              | Default Value                    | Optional Values   |
+| --------------------- | ------------------------ | -------------------------------- | ----------------- |
+| `EnablePathGenerator` | 自动生成对资源路径的引用     | `true`                           | `true` or `false` |
+| `AutoDisableMod`      | 自动禁用其他Mod          | `false`                          | `true` or `false` |
+| `EnableModBuilder`    | 为这个项目生成Mod文件    | `true`                           | `true` or `false` |
+| `DebugMod`            | 自动启用指定Mod          | `HEROsMod;CheatSheet;DragonLens` | `[Mod Name]`      |
+| `PathPrefix`          | 自动路径的前缀           | `string.Empty`                   | `[string]`        | 
+| `PathNamespace`       | 自动路径的命名空间       | `$(RootNamespace)`               | `[string]`        |
+| `PathTypeName`        | 自动路径的类名           | `ModAsset`                       | `[string]`        |

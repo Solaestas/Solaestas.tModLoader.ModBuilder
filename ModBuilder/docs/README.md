@@ -47,13 +47,12 @@ This is an example of TestMod.csproj.
 </Project>
 ```
 
-| Config Name               | Description                                                                                     | Default Value                   | Optional Values   |
-| ------------------------- | ----------------------------------------------------------------------------------------------- | ------------------------------- | ----------------- |
-| `EnablePathGenerator`  | Generate asset path                                                                  | `true`                          | `true` or `false` |
-| `AutoDisableMod` | Automatically disable other mods                                         | `false`                         | `true` or `false` |
-| `EnableModBuilder`        | Indicate that this project is a mod.                                                        | `true`                         | `true` or `false` |
-| `DebugMod`  | Automatically enable debug mods                                   | `herosmod;cheatsheet;dragonlen` | `[Mod Name]`      |
-| `PathPrefix`   | Prefix of asset path                                                                            | `string.Empty`                  | `[string]`        |
-| `PathNamespace` | Namespace of asset path                                                                        | `$(RootNamespace)`                  | `[string]`        |
-| `PathTypeName` | Type name of asset path                                                                        | `ModAsset`                  | `[string]`        |
-
+| Config Name           | Description                          | Default Value                    | Optional Values   |
+| --------------------- | ------------------------------------ | -------------------------------- | ----------------- |
+| `EnablePathGenerator` | Generate asset path                  | `true`                           | `true` or `false` |
+| `AutoDisableMod`      | Automatically disable other mods     | `false`                          | `true` or `false` |
+| `EnableModBuilder`    | Indicate that this project is a mod. | `true`                           | `true` or `false` |
+| `DebugMod`            | Automatically enable debug mods      | `HEROsMod;CheatSheet;DragonLens` | `[Mod Name]`      |
+| `PathPrefix`          | Prefix of asset path                 | `string.Empty`                   | `[string]`        |
+| `PathNamespace`       | Namespace of asset path              | `$(RootNamespace)`               | `[string]`        |
+| `PathTypeName`        | Type name of asset path              | `ModAsset`                       | `[string]`        |

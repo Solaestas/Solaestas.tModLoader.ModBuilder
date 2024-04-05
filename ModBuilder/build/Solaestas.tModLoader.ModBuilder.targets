@@ -103,7 +103,7 @@
 			AfterTargets="Build">
 		<EnableMod BuildingMod="$(AssemblyName)"
 				   ModDirectory="$(ModDirectory)"
-				   MinimalMod="$(AutoDisableMod)"
+				   AutoDisable="$(AutoDisableMod)"
 				   DebugMod="$(DebugMod)" />
 	</Target>
 

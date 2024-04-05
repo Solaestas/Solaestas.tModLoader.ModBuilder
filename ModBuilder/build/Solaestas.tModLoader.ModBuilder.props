@@ -20,7 +20,7 @@
 		<EnablePathGenerator>true</EnablePathGenerator>
 		<AutoDisableMod>false</AutoDisableMod>
 		<!--附加功能配置-->
-		<DebugMod>herosmod;cheatsheet;dragonlen</DebugMod>
+		<DebugMod>HEROsMod;CheatSheet;DragonLens</DebugMod>
 		<PathNamespace>$(RootNamespace)</PathNamespace>
 		<PathTypeName>ModAsset</PathTypeName>
 		<PathPrefix></PathPrefix>
