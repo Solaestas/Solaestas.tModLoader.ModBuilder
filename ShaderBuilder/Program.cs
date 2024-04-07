@@ -1,23 +1,17 @@
-// See https://aka.ms/new-console-template for more information
-using System;
-using System.Collections;
-using System.IO;
-using System.Linq;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 using Microsoft.Xna.Framework.Content.Pipeline.Tasks;
-using Newtonsoft.Json;
 using ShaderBuilder;
 
-var inputFiles = args[0].Split(';');    // 输入文件路径
+var inputFiles = args[0].Split(';');
 var intermediateDirectory = args[1];
-var outputDir = args[2];                // 输出文件夹
-var targetPlatform = args.ElementAtOrDefault(3);
-var targetProfile = args.ElementAtOrDefault(4);
-var buildConfiguration = args.ElementAtOrDefault(5);
+var outputDir = args[2];
+var targetPlatform = args[3];
+var targetProfile = args[4];
+var buildConfiguration = args[5];
 
 var settings = new BuildCoordinatorSettings()
 {
@@ -49,8 +43,14 @@ var processorContext = new XnaContentProcessorContext(buildCoordinator, buildIte
 var contentCompiler = new ContentCompiler();
 foreach (var file in inputFiles)
 {
+	var fileInfo = new FileInfo(file);
 	var output = @$"{outputDir}{Path.ChangeExtension(file, ".xnb")}";
-	helper.LogMessage(MessageImportance.Low, "Building {0} -> {1}", file, output);
+	if (File.GetLastWriteTimeUtc(file) < File.GetLastWriteTimeUtc(output))
+	{
+		helper.LogMessage(MessageImportance.Normal, "Skip {0}", file);
+		continue;
+	}
+	helper.LogMessage(MessageImportance.Normal, "Building {0} -> {1}", file, output);
 	try
 	{
 		var input = importer.Import(file, importContext);
@@ -67,48 +67,3 @@ foreach (var file in inputFiles)
 }
 
 return 0;
-
-namespace ShaderBuilder
-{
-	public class BuildEngine : IBuildEngine
-	{
-		private static readonly JsonSerializerSettings settings = new()
-		{
-			Converters = { new BuildEventArgsConverter() },
-			Formatting = Formatting.None, // Must be None
-		};
-
-		public bool ContinueOnError => false;
-
-		public int LineNumberOfTaskNode => 0;
-
-		public int ColumnNumberOfTaskNode => 0;
-
-		public string ProjectFileOfTaskNode => string.Empty;
-
-		public bool BuildProjectFile(string projectFileName, string[] targetNames, IDictionary globalProperties, IDictionary targetOutputs)
-		{
-			throw new NotImplementedException("Not Implemented");
-		}
-
-		public void LogCustomEvent(CustomBuildEventArgs e)
-		{
-			throw new NotImplementedException();
-		}
-
-		public void LogErrorEvent(BuildErrorEventArgs e)
-		{
-			Console.WriteLine(JsonConvert.SerializeObject(e, settings));
-		}
-
-		public void LogMessageEvent(BuildMessageEventArgs e)
-		{
-			Console.WriteLine(JsonConvert.SerializeObject(e, settings));
-		}
-
-		public void LogWarningEvent(BuildWarningEventArgs e)
-		{
-			Console.WriteLine(JsonConvert.SerializeObject(e, settings));
-		}
-	}
-}

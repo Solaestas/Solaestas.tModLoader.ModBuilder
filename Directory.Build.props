@@ -5,8 +5,18 @@
 		<Authors>Solaestas</Authors>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<IsPackable>false</IsPackable>
+		<Nullable>enable</Nullable>
+		<NeutralLanguage>zh-CN</NeutralLanguage>
+		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="PolySharp" Version="1.14.1" PrivateAssets="all" />
+		<PackageReference Include="PolySharp"
+						  Version="1.14.1"
+						  PrivateAssets="all" />
+		<PackageReference Include="StyleCop.Analyzers.Unstable"
+						  Version="1.2.0.556">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 	</ItemGroup>
 </Project>

@@ -1,9 +1,11 @@
-using System;
+#pragma warning disable CS8602 // 解引用可能出现空引用。
+#pragma warning disable CS8604 // 引用类型参数可能为 null。
 using Microsoft.Build.Framework;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace ShaderBuilder;
+
 public enum MessageType
 {
 	Error,
@@ -13,7 +15,7 @@ public enum MessageType
 
 public class BuildEventArgsConverter : JsonConverter<BuildEventArgs>
 {
-	public override BuildEventArgs ReadJson(JsonReader reader, Type objectType, BuildEventArgs existingValue, bool hasExistingValue, JsonSerializer serializer)
+	public override BuildEventArgs ReadJson(JsonReader reader, Type objectType, BuildEventArgs? existingValue, bool hasExistingValue, JsonSerializer serializer)
 	{
 		if (hasExistingValue)
 		{
@@ -57,7 +59,7 @@ public class BuildEventArgsConverter : JsonConverter<BuildEventArgs>
 		};
 	}
 
-	public override void WriteJson(JsonWriter writer, BuildEventArgs value, JsonSerializer serializer)
+	public override void WriteJson(JsonWriter writer, BuildEventArgs? value, JsonSerializer serializer)
 	{
 		var json = JObject.FromObject(value);
 		json.Add(new JProperty("Type", value switch
@@ -65,8 +67,10 @@ public class BuildEventArgsConverter : JsonConverter<BuildEventArgs>
 			BuildMessageEventArgs => MessageType.Message,
 			BuildWarningEventArgs => MessageType.Warning,
 			BuildErrorEventArgs => MessageType.Error,
-			_ => throw new NotImplementedException()
+			_ => throw new NotImplementedException(),
 		}));
 		json.WriteTo(writer);
 	}
 }
+#pragma warning restore CS8604 // 引用类型参数可能为 null。
+#pragma warning restore CS8602 // 解引用可能出现空引用。

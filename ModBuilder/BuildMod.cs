@@ -7,51 +7,52 @@ namespace Solaestas.tModLoader.ModBuilder;
 
 public class BuildMod : Microsoft.Build.Utilities.Task
 {
+	[Required]
+	public string BuildIdentifier { get; set; } = default!;
+
+	[Required]
+	public string ModDirectory { get; set; } = default!;
+
+	/// <summary>
+	/// 模组名，默认为文件夹名 <br /> 模组名应该与ILoadable的命名空间和程序集名称相同
+	/// </summary>
+	[Required]
+	public string ModName { get; set; } = default!;
+
 	/// <summary>
 	/// 模组源码文件夹
 	/// </summary>
 	[Required]
-	public string ModSourceDirectory { get; set; }
+	public string ModSourceDirectory { get; set; } = default!;
 
 	/// <summary>
 	/// 项目输出文件夹
 	/// </summary>
 	[Required]
-	public string OutputDirectory { get; set; }
-
-	/// <summary>
-	/// 模组名，默认为文件夹名 <br /> 模组名应该与ILoadable的命名空间和程序集名称相同
-	/// </summary>
-	public string ModName { get; set; }
+	public string OutputDirectory { get; set; } = default!;
 
 	/// <summary>
 	/// 无预处理的资源文件，直接从源码中复制
 	/// </summary>
 	[Required]
-	public ITaskItem[] ResourceFiles { get; set; }
+	public ITaskItem[] ResourceFiles { get; set; } = default!;
 
 	[Required]
-	public string ModDirectory { get; set; }
-
-	[Required]
-	public string TmlVersion { get; set; }
-
-	[Required]
-	public string BuildIdentifier { get; set; }
+	public string TmlVersion { get; set; } = default!;
 
 	public override bool Execute()
 	{
 		_ = Enum.TryParse<TmlVersoin>(TmlVersion, out var tmlVersion);
 		var info = new BuildInfo(BuildIdentifier, tmlVersion);
 		string modPath = Path.Combine(ModDirectory, $"{ModName}.tmod");
-		Log.LogMessage(MessageImportance.High, "Building {0} -> {1}", ModName, modPath);
+		Log.LogMessage(MessageImportance.High, LogText.BuildMod, ModName, modPath);
 		var sw = Stopwatch.StartNew();
 
 		var property = BuildProperties.ReadBuildFile(ModSourceDirectory, info);
 		var tmod = new TmodFile(modPath, ModName, property.Version);
 
-		Log.LogMessage(MessageImportance.Normal, "Source Path: {0}", ModSourceDirectory);
-		Log.LogMessage(MessageImportance.Normal, "Output Path: {0}", OutputDirectory);
+		Log.LogMessage(MessageImportance.Normal, LogText.Source, ModSourceDirectory);
+		Log.LogMessage(MessageImportance.Normal, LogText.Output, OutputDirectory);
 
 		// Add dll and pdb
 		var dllref = new HashSet<string>(property.DllReferences);
@@ -60,13 +61,13 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 		// Add Resources
 		Parallel.ForEach(ResourceFiles, file =>
 		{
-			var identity = file.GetMetadata("PathOverride");
-			if (string.IsNullOrEmpty(identity))
+			if (!bool.TryParse(file.GetMetadata("Pack"), out var pack) || !pack)
 			{
-				identity = file.GetMetadata("Identity");
+				return;
 			}
-			Log.LogMessage(MessageImportance.Normal, "Add Resource: {0} -> {1}", identity, file.ItemSpec);
-			bool compressed = tmod.AddFile(identity, file.ItemSpec);
+			var identity = file.GetMetadata("ModPath");
+			Log.LogMessage(MessageImportance.Normal, LogText.AddResource, identity, file.ItemSpec);
+			tmod.AddFile(identity, file.ItemSpec);
 		});
 
 		// Add dll
@@ -76,7 +77,7 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 
 			if (name == ModName)
 			{
-				Log.LogMessage(MessageImportance.Normal, "Add Assembly: {0} -> {1}", name, file);
+				Log.LogMessage(MessageImportance.Normal, LogText.AddAssembly, name, file);
 				tmod.AddFile($"{name}.dll", file);
 				continue;
 			}
@@ -91,7 +92,7 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 				dllref.Add(name);
 			}
 
-			Log.LogMessage(MessageImportance.Normal, "Add Reference: {0} -> {1}", name, file);
+			Log.LogMessage(MessageImportance.Normal, LogText.AddReference, name, file);
 			tmod.AddFile($"lib\\{name}.dll", file);
 		}
 
@@ -108,7 +109,7 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 		tmod.AddFile("Info", property.ToBytes());
 
 		tmod.Save(info);
-		Log.LogMessage(MessageImportance.High, $"Building Success, costs {sw.Elapsed}");
+		Log.LogMessage(MessageImportance.High, LogText.BuildSuccess, sw.Elapsed);
 
 		return true;
 	}

@@ -1,14 +1,17 @@
+#pragma warning disable CS8602 // 解引用可能出现空引用。
+#pragma warning disable CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。
 using System.Collections;
 using System.Collections.Concurrent;
 using System.IO.Compression;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace Solaestas.tModLoader.ModBuilder.ModLoader;
 
 // warning class is not threadsafe
 public class TmodFile(string path, string name, Version version) : IEnumerable<TmodFile.FileEntry>
 {
-	public class FileEntry(string name, int offset, int length, int compressedLength, byte[] cachedBytes = null)
+	public class FileEntry(string name, int offset, int length, int compressedLength, byte[]? cachedBytes = null)
 	{
 		public string Name { get; } = name;
 
@@ -20,7 +23,7 @@ public class TmodFile(string path, string name, Version version) : IEnumerable<T
 		public int CompressedLength { get; } = compressedLength;
 
 		// intended to be readonly, but unfortunately no ReadOnlySpan on .NET 4.5
-		public byte[] CachedBytes { get; } = cachedBytes;
+		public byte[]? CachedBytes { get; } = cachedBytes;
 
 		public bool IsCompressed => Length != CompressedLength;
 	}
@@ -38,7 +41,7 @@ public class TmodFile(string path, string name, Version version) : IEnumerable<T
 
 	public readonly string Path = path;
 
-	private FileStream fileStream;
+	private FileStream? fileStream;
 
 	public IDictionary<string, FileEntry> files = new ConcurrentDictionary<string, FileEntry>();
 
@@ -54,7 +57,7 @@ public class TmodFile(string path, string name, Version version) : IEnumerable<T
 
 	public byte[] Signature { get; private set; } = new byte[256];
 
-	public bool AddFile(string fileName, string filePath)
+	public void AddFile(string fileName, string filePath)
 	{
 		fileName = Sanitize(fileName);
 		using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
@@ -77,7 +80,6 @@ public class TmodFile(string path, string name, Version version) : IEnumerable<T
 			}
 		}
 		files[fileName] = new FileEntry(fileName, -1, size, data.Length, data);
-		return data.Length != size;
 	}
 
 	private bool ShouldCompress(string fileName)
@@ -175,3 +177,5 @@ public class TmodFile(string path, string name, Version version) : IEnumerable<T
 		fileStream = null;
 	}
 }
+#pragma warning restore CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。
+#pragma warning restore CS8602 // 解引用可能出现空引用。

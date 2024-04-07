@@ -303,7 +303,7 @@ public class BuildProperties
 			var split = spec.Split('@');
 			if (split.Length == 1)
 			{
-				return new ModReference(split[0], null);
+				return new ModReference(split[0], null!);
 			}
 
 			if (split.Length > 2)
@@ -333,6 +333,7 @@ public class BuildProperties
 	}
 
 	private static void WriteList<T>(IEnumerable<T> list, BinaryWriter writer)
+		where T : notnull
 	{
 		foreach (var item in list)
 		{

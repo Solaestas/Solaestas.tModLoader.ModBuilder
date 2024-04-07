@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+		<AssemblyName>Solaestas.tModLoader.ModBuilder.Generators</AssemblyName>
+		<RootNamespace>Solaestas.tModLoader.ModBuilder.Generators</RootNamespace>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.9.2" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0-beta1.24052.1" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.CodeAnalysis.ResxSourceGenerator" Version="3.11.0-beta1.24052.1" PrivateAssets="all" />
+	</ItemGroup>
+	<Target Name="CopyOutput" AfterTargets="Build">
+		<ItemGroup>
+			<OutputFiles Include="$(OutputPath)\$(AssemblyName).dll" />
+		</ItemGroup>
+		<Copy SourceFiles="@(OutputFiles)" DestinationFolder="../ModBuilder/analyzer" />
+	</Target>
+</Project>

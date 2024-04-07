@@ -7,15 +7,30 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Publicize Include="Microsoft.Xna.Framework.Content.Pipeline" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-		<PackageReference Include="Krafs.Publicizer" Version="2.2.1">
+		<PackageReference Include="Newtonsoft.Json"
+						  Version="13.0.3" />
+		<PackageReference Include="Krafs.Publicizer"
+						  Version="2.2.1">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<Reference Include="Libraries\*.dll" />
+		<Publicize Include="Microsoft.Xna.Framework.Content.Pipeline" />
 	</ItemGroup>
+
+	<Target Name="CopyOutput"
+			AfterTargets="Build">
+		<ItemGroup>
+			<OutputFiles Include="$(OutputPath)*" />
+		</ItemGroup>
+		<Copy SourceFiles="@(OutputFiles)"
+			  DestinationFolder="../ModBuilder/tools" />
+	</Target>
+
+	<Target Name="CleanCopy" BeforeTargets="Clean">
+		<ItemGroup>
+			<OutputFiles Include="../ModBuilder/tools/*" />
+		</ItemGroup>
+		<Delete Files="@(OutputFiles)" />
+	</Target>
 </Project>

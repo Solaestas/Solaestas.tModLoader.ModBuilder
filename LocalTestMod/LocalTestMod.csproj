@@ -8,4 +8,14 @@
 		<Solaestas-TaskPath>$(MSBuildProjectDirectory)/../ModBuilder/bin/release/netstandard2/Solaestas.tModLoader.ModBuilder.dll</Solaestas-TaskPath>
 		<Solaestas-ShaderBuilderDirectory>$(MSBuildProjectDirectory)/../ShaderBuilder/bin/release/net472-windows/</Solaestas-ShaderBuilderDirectory>
 	</PropertyGroup>
+	<ItemGroup>
+	  <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="../ModGenerator/ModGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+	</ItemGroup>
 </Project>

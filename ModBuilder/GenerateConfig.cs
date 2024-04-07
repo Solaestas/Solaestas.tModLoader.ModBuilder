@@ -1,7 +1,6 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
 using Newtonsoft.Json;
 using Task = Microsoft.Build.Utilities.Task;
 
@@ -13,13 +12,13 @@ public class GenerateConfig : Task
 	/// Config文件保存的路径
 	/// </summary>
 	[Required]
-	public string ConfigPath { get; set; }
+	public string ConfigPath { get; set; } = default!;
 
 	/// <summary>
 	/// tModLoader游戏本体dll文件的路径
 	/// </summary>
 	[Required]
-	public string DllPath { get; set; }
+	public string DllPath { get; set; } = default!;
 
 	public override bool Execute()
 	{
@@ -41,7 +40,7 @@ public class GenerateConfig : Task
 			: identifier.Contains("stable") ? TmlVersoin.Stable
 			: TmlVersoin.Legacy;
 
-		Log.LogMessage(MessageImportance.High, "tModLoader Version: {0}", version.ToString());
+		Log.LogMessage(MessageImportance.High, LogText.DetectVersion, version.ToString());
 
 		var ModDirectory = Path.Combine(
 			Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
@@ -53,7 +52,7 @@ public class GenerateConfig : Task
 				TmlVersoin.Stable => "tModLoader",
 				TmlVersoin.Preview => "tModLoader-preview",
 				TmlVersoin.Developer => "tModLoader-dev",
-				_ => throw new Exception("How to get here?")
+				_ => throw new Exception("How to get here?"),
 			},
 			"Mods\\");
 

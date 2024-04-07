@@ -16,7 +16,7 @@
 			BeforeTargets="InitModBuilder">
 		<Error Condition="'$(tMLPath)' == ''"
 			   Text="Missing tModLoader.targets. Please check its parent directory"
-			   ContinueOnError="false"/>
+			   ContinueOnError="false" />
 	</Target>
 
 	<Target Name="InitModBuilder"
@@ -34,14 +34,16 @@
 		<PropertyGroup>
 			<ModOutput>$(ModDirectory)$(AssemblyName).tmod</ModOutput>
 		</PropertyGroup>
-		<!--阻止tML程序集复制到输出目录-->
 		<ItemGroup>
+			<!--阻止tML程序集复制到输出目录-->
 			<Reference Update="$(tMLLibraryPath)/**/*.dll;$(tMLSteamPath)$(tMLPath)"
 					   Private="false" />
-			<EffectOutputs Include="@(ModEffect->'$(OutputPath)Assets\%(RelativeDir)%(Filename).xnb')">
-				<PathOverride>%(Identity)</PathOverride>
-			</EffectOutputs>
-
+			<AdditionalFiles Remove="**/*.fx" />
+			<EffectOutputs Include="@(ModEffect->'$(OutputPath)Assets\%(RelativeDir)%(Filename).xnb')"
+						   ModPath="$([System.IO.Path]::ChangeExtension(%(ModPath), '.xnb'))" />
+			<AdditionalFiles Include="@(EffectOutputs)"
+							 ModPath="%(ModPath)"
+							 Pack="true" />
 			<UpToDateCheckInput Include="@(ModEffect)"
 								Set="Effects" />
 			<UpToDateCheckOutput Include="@(EffectOutputs)"
@@ -71,7 +73,7 @@
 					 TargetPlatform="Windows"
 					 TargetProfile="HiDef"
 					 BuildConfiguration="Debug"
-					 IntermediateDirectory="$(IntermediateOutputPath)Assets\"
+					 IntermediateDirectory="$(BaseIntermediateOutputPath)"
 					 OutputDirectory="$(OutputPath)Assets\">
 		</BuildEffect>
 	</Target>
@@ -88,12 +90,12 @@
 	<Target Name="BuildMod"
 			Condition="$(EnableModBuilder)"
 			AfterTargets="ReadyToBuildMod"
-			Inputs="$(Solaestas-ConfigPath);@(ModResource);@(CompileOutputs);@(EffectOutputs);@(ModInfo)"
+			Inputs="$(Solaestas-ConfigPath);@(AdditionalFiles);@(CompileOutputs);@(ModInfo)"
 			Outputs="$(ModOutput)">
 		<BuildMod ModSourceDirectory="$(MSBuildProjectDirectory)\"
 				  ModName="$(AssemblyName)"
 				  OutputDirectory="$(OutputPath)"
-				  ResourceFiles="@(ModResource)"
+				  ResourceFiles="@(AdditionalFiles)"
 				  ModDirectory="$(ModDirectory)"
 				  BuildIdentifier="$(BuildIdentifier)"
 				  TmlVersion="$(TmlVersion)" />
@@ -108,24 +110,8 @@
 				   DebugMod="$(DebugMod)" />
 	</Target>
 
-	<Target Name="Solaestas-GeneratePath"
-			BeforeTargets="BeforeCompile"
-			Condition="$(EnablePathGenerator)">
-		<PropertyGroup>
-			<PathNamespace Condition="$(PathNamespace) == ''">$(RootNamespace)</PathNamespace>
-		</PropertyGroup>
-		<GeneratePath AssetFiles="@(ModEffect);@(ModResource)"
-					  ClassName="$(PathTypeName)"
-					  AssetPrefix="$(PathPrefix)"
-					  Namespace="$(PathNamespace)"
-					  OutputDirectory="$(BaseIntermediateOutputPath)" />
-	</Target>
-
-	<Target Name="Solaestas-CleanAsset"
+	<Target Name="CleanModBuilder"
 			BeforeTargets="Clean">
-		<RemoveDir Directories="$(IntermediateOutputPath)Assets" />
-		<Delete Condition="$(EnablePathGenerator)"
-				Files="$(BaseIntermediateOutputPath)ModPath.g.cs" />
 		<Delete Files="$(Solaestas-ConfigPath)" />
 		<Delete Files="@(EffectOutputs)" />
 	</Target>

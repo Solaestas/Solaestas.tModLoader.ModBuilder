@@ -1,22 +1,22 @@
 # Solaestas' ModBuilder
 
-This is a NuGet package for tModLoader mod makers which modifies and automates mod building procedure.
+这是一个用于 tModLoader 模组制作者的 NuGet 包，用于修改和自动化模组构建过程。
 
-document is not finished yet
+文档尚未完善
 
-## Feature
+## 功能
 
-- Include referenced dll automatically
-- Compile and Include fx files automatically
-- Publicize FNA and tModLoader assembly using BepInEx.AssemblyPublicizer.MSBuild
-- Generate asset path automatically (default: on)
-- Disable other mods automatically in building (default: off)
+- 自动添加引用 dll
+- 自动编译fx文件
+- 使用`BepInEx.AssemblyPublicizer.MSBuild`公有化tModLoader和FNA程序集
+- 自动生成资源路径（默认开启）
+- 自动禁用其他模组（默认关闭）
 
-## Supported Config
+## 可配置项
 
-The following configs are all MSBuild Properties, which can be set in `csproj` file or `Directory.Build.props` file.
+所有配置项都是 MSBuild 属性，可以在 `csproj` 文件或 `Directory.Build.props` 文件中设置。
 
-This is an example of TestMod.csproj.
+下面为一个示例Mod的 `csproj` 文件：
 
 ```xml
 <Project>
@@ -30,13 +30,18 @@ This is an example of TestMod.csproj.
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<!--Disable Other mod during building-->
+		<!--启用自动禁用其他Mod-->
 		<AutoDisableMod>true</AutoDisableMod>
+		<!--修改自动路径的类目-->
+		<PathTypeName>ModPath</PathTypeName>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<!--Include all bmp file-->
-		<ResourceFile Include="**/*.bmp" />
+		<!--将所有bmp文件打包进Mod-->
+		<AdditionalFiles Include="**/*.bmp"
+						 Exclude="bin/**/*;obj/**/*" 
+						 Pack="true"
+						 ModPath="%(Identity)"/>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -45,12 +50,12 @@ This is an example of TestMod.csproj.
 </Project>
 ```
 
-| Config Name           | Description                          | Default Value                    | Optional Values   |
-| --------------------- | ------------------------------------ | -------------------------------- | ----------------- |
-| `EnablePathGenerator` | Generate asset path                  | `true`                           | `true` or `false` |
-| `AutoDisableMod`      | Automatically disable other mods     | `false`                          | `true` or `false` |
-| `EnableModBuilder`    | Indicate that this project is a mod. | `true`                           | `true` or `false` |
-| `DebugMod`            | Automatically enable debug mods      | `HEROsMod;CheatSheet;DragonLens` | `[Mod Name]`      |
-| `PathPrefix`          | Prefix of asset path                 | `string.Empty`                   | `[string]`        |
-| `PathNamespace`       | Namespace of asset path              | `$(RootNamespace)`               | `[string]`        |
-| `PathTypeName`        | Type name of asset path              | `ModAsset`                       | `[string]`        |
+| Config Name           | Description              | Default Value                    | Optional Values   |
+| --------------------- | ------------------------ | -------------------------------- | ----------------- |
+| `EnablePathGenerator` | 自动生成对资源路径的引用     | `true`                           | `true` or `false` |
+| `AutoDisableMod`      | 自动禁用其他Mod          | `false`                          | `true` or `false` |
+| `EnableModBuilder`    | 为这个项目生成Mod文件    | `true`                           | `true` or `false` |
+| `DebugMod`            | 自动启用指定Mod          | `HEROsMod;CheatSheet;DragonLens` | `[Mod Name]`      |
+| `PathPrefix`          | 自动路径的前缀           | `string.Empty`                   | `[string]`        | 
+| `PathNamespace`       | 自动路径的命名空间       | `$(RootNamespace)`               | `[string]`        |
+| `PathTypeName`        | 自动路径的类名           | `ModAsset`                       | `[string]`        |
