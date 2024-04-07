@@ -25,8 +25,9 @@ public class PathGenerator : ISourceGenerator
 			""");
 
 		var modName = context.Compilation.Assembly.Name;
+		var rootNamespce = context.GetProperty("RootNamespace", modName);
 		var typename = context.GetProperty("PathTypeName", "ModAsset");
-		var rootNamespace = context.GetProperty("PathNamespace", modName);
+		var rootNamespace = context.GetProperty("PathNamespace", rootNamespce);
 		var prefix = context.GetProperty("PathPrefix", string.Empty);
 		if (prefix.Length > 0 && prefix[^1] != '/')
 		{
@@ -59,6 +60,7 @@ public class PathGenerator : ISourceGenerator
 				continue;
 			}
 
+			modPath = modPath.Replace('\\', '/');
 			var filename = Path.GetFileNameWithoutExtension(modPath);
 			var dirname = Path.GetFileName(Path.GetDirectoryName(modPath));
 			if (char.IsDigit(filename[0]))
@@ -87,11 +89,12 @@ public class PathGenerator : ISourceGenerator
 					[file.Path, origin.Path]));
 				goto Continue;
 			}
+			paths.Add(filename, file);
 
 			var ext = Path.GetExtension(modPath);
 			string? assetType = ext switch
 			{
-				".fx" => "Effect",
+				".xnb" => "Effect",
 				".png" => "Texture2D",
 				_ => null,
 			};
@@ -99,6 +102,7 @@ public class PathGenerator : ISourceGenerator
 			if (assetType != null)
 			{
 				source.AppendLine($$"""
+					/// <summary>{{prefix}}{{modPath}}</summary>
 					public static Asset<{{assetType}}> {{filename}} => _repo.Request<{{assetType}}>({{filename}}Path, AssetRequestMode.ImmediateLoad);
 				""");
 				modPath = modPath[..^ext.Length];

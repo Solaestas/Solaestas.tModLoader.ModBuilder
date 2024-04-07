@@ -21,16 +21,18 @@
 		<Solaestas-TaskPath>$(MSBuildThisFileDirectory)Solaestas.tModLoader.ModBuilder.dll</Solaestas-TaskPath>
 		<Solaestas-ShaderBuilderDirectory>$(MSBuildThisFileDirectory)../tools/</Solaestas-ShaderBuilderDirectory>
 		<!--附加功能开关-->
-		<EnablePathGenerator>true</EnablePathGenerator>
-		<AutoDisableMod>false</AutoDisableMod>
+		<EnablePathGenerator Condition="$(EnablePathGenerator) == ''">true</EnablePathGenerator>
+		<AutoDisableMod Condition="$(AutoDisableMod) == ''">false</AutoDisableMod>
 		<!--附加功能配置-->
-		<DebugMod>HEROsMod;CheatSheet;DragonLens</DebugMod>
+		<DebugMod Condition="$(DebugMod) == ''">HEROsMod;CheatSheet;DragonLens</DebugMod>
 		<!--是否启用-->
-		<EnableModBuilder>true</EnableModBuilder>
+		<EnableModBuilder Condition="$(EnableModBuilder) == ''">true</EnableModBuilder>
+		<ProcessResource Condition="$(ProcessResource) == ''">$(EnableModBuilder)</ProcessResource>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<!--Source Generator-->
+		<CompilerVisibleProperty Include="RootNamespace" />
 		<CompilerVisibleProperty Include="EnablePathGenerator" />
 		<CompilerVisibleProperty Include="PathTypeName" />
 		<CompilerVisibleProperty Include="PathNamespace" />
@@ -56,7 +58,8 @@
 						 ModPath="%(Identity)"
 						 Pack="true"
 						 Exclude="bin/**/*;obj/**/*" />
-		<AdditionalFiles Remove="@(ModInfo)" />
+		<AdditionalFiles Update="@(ModInfo)"
+						 Pack="false"/>
 		<!--默认Publicizer-->
 		<Publicize Include="tModLoader;FNA" />
 	</ItemGroup>

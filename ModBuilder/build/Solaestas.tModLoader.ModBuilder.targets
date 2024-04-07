@@ -20,8 +20,7 @@
 	</Target>
 
 	<Target Name="InitModBuilder"
-			BeforeTargets="ResolveLockFileReferences"
-			Condition="$(EnableModBuilder)">
+			BeforeTargets="ResolveLockFileReferences">
 		<!--读取配置文件-->
 		<ReadConfig ConfigPath="$(Solaestas-ConfigPath)">
 			<Output TaskParameter="ModDirectory"
@@ -31,13 +30,16 @@
 			<Output TaskParameter="BuildIdentifier"
 					PropertyName="BuildIdentifier" />
 		</ReadConfig>
-		<PropertyGroup>
-			<ModOutput>$(ModDirectory)$(AssemblyName).tmod</ModOutput>
-		</PropertyGroup>
-		<ItemGroup>
-			<!--阻止tML程序集复制到输出目录-->
+		<!--阻止tML程序集复制到输出目录-->
+		<ItemGroup Condition="$(EnableModBuilder)">
 			<Reference Update="$(tMLLibraryPath)/**/*.dll;$(tMLSteamPath)$(tMLPath)"
 					   Private="false" />
+		</ItemGroup>
+		<!--处理资源文件-->
+		<PropertyGroup Condition="$(ProcessResource)">
+			<ModOutput>$(ModDirectory)$(AssemblyName).tmod</ModOutput>
+		</PropertyGroup>
+		<ItemGroup Condition="$(ProcessResource)">
 			<AdditionalFiles Remove="**/*.fx" />
 			<EffectOutputs Include="@(ModEffect->'$(OutputPath)Assets\%(RelativeDir)%(Filename).xnb')"
 						   ModPath="$([System.IO.Path]::ChangeExtension(%(ModPath), '.xnb'))" />
@@ -55,8 +57,7 @@
 	<Target Name="GenerateConfig"
 			BeforeTargets="InitModBuilder"
 			Inputs="$(tMLSteamPath)$(tMLPath)"
-			Outputs="$(Solaestas-ConfigPath)"
-			Condition="$(EnableModBuilder)">
+			Outputs="$(Solaestas-ConfigPath)">
 		<!--生成tML版本信息-->
 		<GenerateConfig DllPath="$(tMLSteamPath)$(tMLPath)"
 						ConfigPath="$(Solaestas-ConfigPath)">
@@ -64,7 +65,7 @@
 	</Target>
 
 	<Target Name="BuildEffect"
-			Condition="$(EnableModBuilder)"
+			Condition="$(ProcessResource)"
 			AfterTargets="Compile"
 			Inputs="@(ModEffect)"
 			Outputs="@(EffectOutputs)">
@@ -78,19 +79,11 @@
 		</BuildEffect>
 	</Target>
 
-	<Target Name="ReadyToBuildMod"
-			Condition="$(EnableModBuilder)"
-			AfterTargets="Build">
-		<ItemGroup>
-			<CompileOutputs Include="$(OutputPath)*" />
-		</ItemGroup>
-	</Target>
-
 	<!--覆盖tML编译-->
 	<Target Name="BuildMod"
-			Condition="$(EnableModBuilder)"
-			AfterTargets="ReadyToBuildMod"
-			Inputs="$(Solaestas-ConfigPath);@(AdditionalFiles);@(CompileOutputs);@(ModInfo)"
+			Condition="$(EnableModBuilder)" 
+			AfterTargets="Build"
+			Inputs="$(Solaestas-ConfigPath);@(AdditionalFiles);@(Compile);@(ModInfo)"
 			Outputs="$(ModOutput)">
 		<BuildMod ModSourceDirectory="$(MSBuildProjectDirectory)\"
 				  ModName="$(AssemblyName)"
