@@ -86,7 +86,7 @@
 			Inputs="$(Solaestas-ConfigPath);@(AdditionalFiles);@(Compile);@(ModInfo)"
 			Outputs="$(ModOutput)">
 		<BuildMod ModSourceDirectory="$(MSBuildProjectDirectory)\"
-				  ModName="$(AssemblyName)"
+				  ModName="$(ModName)"
 				  OutputDirectory="$(OutputPath)"
 				  ResourceFiles="@(AdditionalFiles)"
 				  ModDirectory="$(ModDirectory)"
@@ -97,7 +97,7 @@
 	<Target Name="Solaestas-EnableMod"
 			Condition="$(EnableModBuilder)"
 			AfterTargets="Build">
-		<EnableMod BuildingMod="$(AssemblyName)"
+		<EnableMod BuildingMod="$(ModName)"
 				   ModDirectory="$(ModDirectory)"
 				   AutoDisable="$(AutoDisableMod)"
 				   DebugMod="$(DebugMod)" />

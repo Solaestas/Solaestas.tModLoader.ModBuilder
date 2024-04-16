@@ -1,6 +1,8 @@
 using System.Text;
 using Terraria;
 using Terraria.ModLoader;
+using Terraria.UI.Chat;
+using Microsoft.Xna.Framework;
 
 namespace TestMod;
 

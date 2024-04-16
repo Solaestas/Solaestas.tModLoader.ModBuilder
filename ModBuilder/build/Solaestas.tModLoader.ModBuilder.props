@@ -28,6 +28,7 @@
 		<!--是否启用-->
 		<EnableModBuilder Condition="$(EnableModBuilder) == ''">true</EnableModBuilder>
 		<ProcessResource Condition="$(ProcessResource) == ''">$(EnableModBuilder)</ProcessResource>
+		<ModName>$(AssemblyName)</ModName>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -37,6 +38,7 @@
 		<CompilerVisibleProperty Include="PathTypeName" />
 		<CompilerVisibleProperty Include="PathNamespace" />
 		<CompilerVisibleProperty Include="PathPrefix" />
+		<CompilerVisibleProperty Include="ModName" />
 		<CompilerVisibleItemMetadata Include="AdditionalFiles"
 									 MetadataName="Pack" />
 		<CompilerVisibleItemMetadata Include="AdditionalFiles"

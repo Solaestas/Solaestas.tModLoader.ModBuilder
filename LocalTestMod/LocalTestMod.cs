@@ -33,6 +33,6 @@ public class LocalTestMod : Mod
 		Logger.Info(Main._renderTargetMaxSize);
 
 		// Print asset path
-		Logger.Info(ModAsset.TestPath);
+		Logger.Info(ModAsset.Test_Path);
 	}
 }
