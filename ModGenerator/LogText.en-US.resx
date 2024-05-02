@@ -117,4 +117,28 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="MB0001Message" xml:space="preserve">
+    <value>{0} 文件名相同，将自动添加前缀</value>
+  </data>
+  <data name="MB0001Title" xml:space="preserve">
+    <value>文件名相同</value>
+  </data>
+  <data name="MB0002Message" xml:space="preserve">
+    <value>{0} 文件名不能作为字段名，因此将跳过生成</value>
+  </data>
+  <data name="MB0002Title" xml:space="preserve">
+    <value>文件名不合法</value>
+  </data>
+  <data name="MB0003Message" xml:space="preserve">
+    <value>属性 {0} 未找到</value>
+  </data>
+  <data name="MB0003Title" xml:space="preserve">
+    <value>MSBuild属性缺失</value>
+  </data>
+  <data name="MB0004Message" xml:space="preserve">
+    <value>文件 {0} 不存在元数据 {1}</value>
+  </data>
+  <data name="MB0004Title" xml:space="preserve">
+    <value>MSBuild元数据缺失</value>
+  </data>
 </root>

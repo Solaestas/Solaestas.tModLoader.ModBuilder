@@ -101,6 +101,7 @@ public unsafe struct PathMember
 
 		// public const string Dir_Name$
 		builder.Replace('\\', '_', start, nameLength);
+		builder.Replace('/', '_', start, nameLength);
 		builder.CopyTo(start, nameBuffer, 0, nameLength);
 
 		// public const string Dir_Name_Path = "$

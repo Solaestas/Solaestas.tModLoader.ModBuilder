@@ -118,10 +118,10 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="MB0001Message" xml:space="preserve">
-    <value>{0} 和 {1} 文件名重复，将只生成第一个文件路径引用</value>
+    <value>{0} 文件名相同，将自动添加前缀</value>
   </data>
   <data name="MB0001Title" xml:space="preserve">
-    <value>资源文件名重复</value>
+    <value>文件名相同</value>
   </data>
   <data name="MB0002Message" xml:space="preserve">
     <value>{0} 文件名不能作为字段名，因此将跳过生成</value>

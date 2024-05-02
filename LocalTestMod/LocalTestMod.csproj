@@ -2,7 +2,7 @@
 	<Import Project="../ModBuilder/build/Solaestas.tModLoader.ModBuilder.props" />
 	<Import Project="../ModBuilder/build/Solaestas.tModLoader.ModBuilder.targets" />
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Solaestas-TaskPath>$(MSBuildProjectDirectory)/../ModBuilder/bin/release/netstandard2/Solaestas.tModLoader.ModBuilder.dll</Solaestas-TaskPath>

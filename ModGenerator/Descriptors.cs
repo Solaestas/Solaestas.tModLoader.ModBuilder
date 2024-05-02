@@ -8,14 +8,14 @@ public static class Descriptors
 	private const string Category = nameof(ModBuilder);
 
 	/// <summary>
-	/// 文件名重复
+	/// 文件名冲突
 	/// </summary>
 	public static readonly DiagnosticDescriptor MB0001 = new(
 		nameof(MB0001),
 		new LocalizableResourceString(nameof(LogText.MB0001Title), LogText.ResourceManager, typeof(LogText)),
 		new LocalizableResourceString(nameof(LogText.MB0001Message), LogText.ResourceManager, typeof(LogText)),
 		Category,
-		DiagnosticSeverity.Warning,
+		DiagnosticSeverity.Info,
 		true
 	);
 
