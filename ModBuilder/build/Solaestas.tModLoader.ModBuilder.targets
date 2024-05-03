@@ -31,13 +31,15 @@
 					PropertyName="BuildIdentifier" />
 		</ReadConfig>
 		<!--阻止tML程序集复制到输出目录-->
-		<ItemGroup Condition="$(EnableModBuilder)">
+		<ItemGroup Condition="$(NotCopyLocal)">
 			<Reference Update="$(tMLLibraryPath)/**/*.dll;$(tMLSteamPath)$(tMLPath)"
 					   Private="false" />
 		</ItemGroup>
-		<!--处理资源文件-->
 		<PropertyGroup Condition="$(ProcessResource)">
+			<!--处理资源文件-->
 			<ModOutput>$(ModDirectory)$(AssemblyName).tmod</ModOutput>
+			<!--默认模组名-->
+			<ModName Condition="$(ModName) == ''">$(AssemblyName)</ModName>
 		</PropertyGroup>
 		<ItemGroup Condition="$(ProcessResource)">
 			<AdditionalFiles Remove="**/*.fx" />

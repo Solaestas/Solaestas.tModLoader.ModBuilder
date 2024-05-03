@@ -35,6 +35,6 @@ public class TestMod : Mod
 		Logger.Info(Main._renderTargetMaxSize);
 
 		// Print asset path
-		Logger.Info(ModAsset.TestTXTPath);
+		Logger.Info(ModAsset.TestTXT_Path);
 	}
 }

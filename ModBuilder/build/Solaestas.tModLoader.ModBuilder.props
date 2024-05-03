@@ -28,7 +28,7 @@
 		<!--是否启用-->
 		<EnableModBuilder Condition="$(EnableModBuilder) == ''">true</EnableModBuilder>
 		<ProcessResource Condition="$(ProcessResource) == ''">$(EnableModBuilder)</ProcessResource>
-		<ModName>$(AssemblyName)</ModName>
+		<NotCopyLocal Condition="$(NotCopyLocal) == ''">$(EnableModBuilder)</NotCopyLocal>
 	</PropertyGroup>
 
 	<ItemGroup>
