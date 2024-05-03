@@ -52,7 +52,11 @@
 								Set="Effects" />
 			<UpToDateCheckOutput Include="@(EffectOutputs)"
 								 Set="Effects" />
+		</ItemGroup>
+		<ItemGroup Condition="$(EnableModBuilder)">
+			<ModReference Include="$(OutputPath)*.dll" Exclude="$(OutputPath)$(AssemblyName).dll" />
 			<UpToDateCheckBuilt Include="$(ModOutput)" />
+			<UpToDateCheckInput Include="@(ModReference)" />
 		</ItemGroup>
 	</Target>
 
@@ -85,7 +89,7 @@
 	<Target Name="BuildMod"
 			Condition="$(EnableModBuilder)" 
 			AfterTargets="Build"
-			Inputs="$(Solaestas-ConfigPath);@(AdditionalFiles);@(Compile);@(ModInfo)"
+			Inputs="$(Solaestas-ConfigPath);@(AdditionalFiles);@(Compile);@(ModInfo);@(ModReference)"
 			Outputs="$(ModOutput)">
 		<BuildMod ModSourceDirectory="$(MSBuildProjectDirectory)\"
 				  ModName="$(ModName)"
