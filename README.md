@@ -1,53 +1,61 @@
-﻿# Solaestas' ModBuilder
+# Solaestas' ModBuilder
 
-This is a NuGet package for tModLoader mod makers which modifies and automates mod building procedure.
+这是一个用于 tModLoader 模组制作者的 NuGet 包，用于修改和自动化模组构建过程。
 
-document is not finished yet
+文档尚未完善
 
-## Supported Config
+## 功能
 
-The following configs are all MSBuild Properties, which can be set in `csproj` file or `Directory.Build.props` file.
+- 自动添加引用 dll
+- 自动编译fx文件
+- 使用`BepInEx.AssemblyPublicizer.MSBuild`公有化tModLoader和FNA程序集
+- 自动生成资源路径（默认开启）
+- 自动禁用其他模组（默认关闭）
 
-This is an example of MyMod.csproj.
+## 可配置项
+
+所有配置项都是 MSBuild 属性，可以在 `csproj` 文件或 `Directory.Build.props` 文件中设置。
+
+下面为一个示例Mod的 `csproj` 文件：
 
 ```xml
 <Project>
-	<Import Project="..\tModLoader.targets"/>
+	<Import Project="..\tModLoader.targets" />
 
 	<PropertyGroup>
-    <AssemblyName>TestMod</AssemblyName>
-    <TargetFramework>net6.0</TargetFramework>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
+		<AssemblyName>TestMod</AssemblyName>
+		<TargetFramework>net6.0</TargetFramework>
+		<PlatformTarget>AnyCPU</PlatformTarget>
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
 
-  <PropertyGroup>
-    <!--Disable Publicizer-->
-    <Solaestas-UsePublicizer>false</Solaestas-UsePublicizer>
-    <!--Disable Other mod during building-->
-    <Solaestas-UseMinimalMod>true</Solaestas-UseMinimalMod>
-    <!--Only include files assigned by ResourceFile-->
-    <Solaestas-BuildIgnore>false</Solaestas-BuildIgnore>
-  </PropertyGroup>
+	<PropertyGroup>
+		<!--启用自动禁用其他Mod-->
+		<AutoDisableMod>true</AutoDisableMod>
+		<!--修改自动路径的类目-->
+		<PathTypeName>ModPath</PathTypeName>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <!--Include all bmp file-->
-    <ResourceFile Include="**/*.bmp" />
-  </ItemGroup>
+	<ItemGroup>
+		<!--将所有bmp文件打包进Mod-->
+		<AdditionalFiles Include="**/*.bmp"
+						 Exclude="bin/**/*;obj/**/*" 
+						 Pack="true"
+						 ModPath="%(Identity)"/>
+	</ItemGroup>
 
-
-  <ItemGroup>
-    <PackageReference Include="tModLoader.CodeAssist" Version="0.1.*" />
-  </ItemGroup>
- </Project>
+	<ItemGroup>
+		<PackageReference Include="tModLoader.CodeAssist" Version="0.1.*" />
+	</ItemGroup>
+</Project>
 ```
 
-| Config Name               | Description                                                                                     | Default Value                   | Optional Values   |
-| ------------------------- | ----------------------------------------------------------------------------------------------- | ------------------------------- | ----------------- |
-| `Solaestas-UseAssetPath`  | Whether to generate asset path                                                                  | `true`                          | `true` or `false` |
-| `Solaestas-UsePublicizer` | Whether to reference BepInEx.AssemblyPublicizer.MSBuild                                         | `true`                          | `true` or `false` |
-| `Solaestas-UseMinimalMod` | Whether to disable other mods automatically in building                                         | `false`                         | `true` or `false` |
-| `Solaestas-NotMod`        | Indicate that this project is not a mod.                                                        | `false`                         | `true` or `false` |
-| `Solaestas-WhitelistMod`  | white list mod which avoid to be disable via `UseMinimalMod`                                    | `herosmod;cheatsheet;dragonlen` | `[Mod Name]`      |
-| `Solaestas-BuildIgnore`   | `true`: read ignore files from build.txt<br>`false`: only read resource file defined in msbuild | `true`                          | `true` or `false` |
-| `Solaestas-AssetPrefix`   | Prefix of asset path                                                                            | `string.Empty`                  | `[string]`        |
+| Config Name           | Description              | Default Value                    | Optional Values   |
+| --------------------- | ------------------------ | -------------------------------- | ----------------- |
+| `EnablePathGenerator` | 自动生成对资源路径的引用     | `true`                           | `true` or `false` |
+| `AutoDisableMod`      | 自动禁用其他Mod          | `false`                          | `true` or `false` |
+| `EnableModBuilder`    | 为这个项目生成Mod文件    | `true`                           | `true` or `false` |
+| `DebugMod`            | 自动启用指定Mod          | `HEROsMod;CheatSheet;DragonLens` | `[Mod Name]`      |
+| `PathPrefix`          | 自动路径的前缀           | `string.Empty`                   | `[string]`        | 
+| `PathNamespace`       | 自动路径的命名空间       | `$(RootNamespace)`               | `[string]`        |
+| `PathTypeName`        | 自动路径的类名           | `ModAsset`                       | `[string]`        |
