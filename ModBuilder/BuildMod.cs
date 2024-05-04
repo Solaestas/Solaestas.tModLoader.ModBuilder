@@ -25,17 +25,17 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 	[Required]
 	public string ModSourceDirectory { get; set; } = default!;
 
-	/// <summary>
-	/// 项目输出文件夹
-	/// </summary>
 	[Required]
-	public string OutputDirectory { get; set; } = default!;
+	public ITaskItem Asset { get; set; } = default!;
 
-	/// <summary>
-	/// 无预处理的资源文件，直接从源码中复制
-	/// </summary>
 	[Required]
-	public ITaskItem[] ResourceFiles { get; set; } = default!;
+	public ITaskItem[] ModReference { get; set; } = default!;
+
+	[Required]
+	public ITaskItem DebugSymbol { get; set; } = default!;
+
+	[Required]
+	public ITaskItem ModAssembly { get; set; } = default!;
 
 	[Required]
 	public string TmlVersion { get; set; } = default!;
@@ -52,104 +52,36 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 		var tmod = new TmodFile(modPath, ModName, property.Version);
 
 		Log.LogMessage(MessageImportance.Normal, LogText.Source, ModSourceDirectory);
-		Log.LogMessage(MessageImportance.Normal, LogText.Output, OutputDirectory);
 
 		// Add dll and pdb
 		var dllref = new HashSet<string>(property.DllReferences);
 		var modref = new HashSet<string>(property.ModReferences.Select(mod => mod.Mod));
 
-		// Add Resources
-		Parallel.ForEach(ResourceFiles, file =>
+		// Add dll and pdb
+		tmod.AddFile($"{ModName}.dll", ModAssembly.ItemSpec);
+		Log.LogMessage(MessageImportance.Normal, LogText.AddAssembly, ModName, ModAssembly.ItemSpec);
+		tmod.AddFile($"{ModName}.pdb", DebugSymbol.ItemSpec);
+		property.EacPath = DebugSymbol.ItemSpec;
+		foreach(var lib in ModReference)
 		{
-			if (!bool.TryParse(file.GetMetadata("Pack"), out var pack) || !pack)
-			{
-				return;
-			}
-			var identity = file.GetMetadata("ModPath");
-			Log.LogMessage(MessageImportance.Normal, LogText.AddResource, identity, file.ItemSpec);
-			tmod.AddFile(identity, file.ItemSpec);
-		});
-
-		// Add dll
-		foreach (var file in Directory.EnumerateFiles(OutputDirectory, "*.dll", SearchOption.TopDirectoryOnly))
-		{
-			var name = Path.GetFileNameWithoutExtension(file);
-
-			if (name == ModName)
-			{
-				Log.LogMessage(MessageImportance.Normal, LogText.AddAssembly, name, file);
-				tmod.AddFile($"{name}.dll", file);
-				continue;
-			}
-
-			if (modref.Contains(name))
+			var filename = lib.GetMetadata("Filename");
+			if (modref.Contains(filename))
 			{
 				continue;
 			}
-
-			if (!dllref.Contains(name))
-			{
-				dllref.Add(name);
-			}
-
-			Log.LogMessage(MessageImportance.Normal, LogText.AddReference, name, file);
-			tmod.AddFile($"lib\\{name}.dll", file);
-		}
-
-		// Add pdb
-		var pdbPath = Path.Combine(OutputDirectory, $"{ModName}.pdb");
-		if (File.Exists(pdbPath))
-		{
-			tmod.AddFile($"{ModName}.pdb", pdbPath);
-			property.EacPath = pdbPath;
+			dllref.Add(filename);
+			tmod.AddFile($"lib\\{filename}.dll", lib.ItemSpec);
+			Log.LogMessage(MessageImportance.Normal, LogText.AddReference, filename, lib.ItemSpec);
 		}
 
 		// Add Info
 		property.DllReferences = [.. dllref];
 		tmod.AddFile("Info", property.ToBytes());
 
-		tmod.Save(info);
+		using var assetFile = File.OpenRead(Asset.ItemSpec);
+		tmod.Save(info, assetFile);
 		Log.LogMessage(MessageImportance.High, LogText.BuildSuccess, sw.Elapsed);
 
 		return true;
-	}
-
-	public bool IgnoreFile(string path, BuildProperties properties)
-	{
-		var ext = Path.GetExtension(path);
-
-		if (path[0] == '.')
-		{
-			return true;
-		}
-
-		if (path.StartsWith("bin", StringComparison.Ordinal)
-			|| path.StartsWith("obj", StringComparison.Ordinal)
-			|| path.StartsWith("Properties", StringComparison.Ordinal))
-		{
-			return true;
-		}
-
-		if (path is "icon.png")
-		{
-			return false;
-		}
-
-		if (path is "build.txt" or "description.txt" or "description_workshop.txt" or "LICENSE.txt")
-		{
-			return true;
-		}
-
-		if (!properties.IncludeSource && ext is ".cs" or ".fx" or ".csproj" or ".sln")
-		{
-			return true;
-		}
-
-		if (ext is ".png" or ".md" or ".cache")
-		{
-			return true;
-		}
-
-		return false;
 	}
 }

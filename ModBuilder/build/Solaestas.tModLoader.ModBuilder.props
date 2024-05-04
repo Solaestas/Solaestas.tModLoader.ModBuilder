@@ -27,13 +27,12 @@
 		<DebugMod Condition="$(DebugMod) == ''">HEROsMod;CheatSheet;DragonLens</DebugMod>
 		<!--是否启用-->
 		<EnableModBuilder Condition="$(EnableModBuilder) == ''">true</EnableModBuilder>
-		<ProcessResource Condition="$(ProcessResource) == ''">$(EnableModBuilder)</ProcessResource>
+		<CompileEffect Condition="$(CompileEffect) == ''">$(EnableModBuilder)</CompileEffect>
 		<NotCopyLocal Condition="$(NotCopyLocal) == ''">$(EnableModBuilder)</NotCopyLocal>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<!--Source Generator-->
-		<CompilerVisibleProperty Include="RootNamespace" />
 		<CompilerVisibleProperty Include="EnablePathGenerator" />
 		<CompilerVisibleProperty Include="PathTypeName" />
 		<CompilerVisibleProperty Include="PathNamespace" />
@@ -45,8 +44,7 @@
 									 MetadataName="ModPath" />
 		<!--Shader代码-->
 		<ModEffect Include="**/*.fx"
-				   Exclude="bin/**/*;obj/**/*"
-				   ModPath="%(Identity)" />
+				   Exclude="bin/**/*;obj/**/*" />
 		<!--Mod信息-->
 		<ModInfo Condition="Exists('build.txt')"
 				 Include="build.txt" />
@@ -54,15 +52,21 @@
 				 Include="description.txt" />
 		<!--资源文件，hjson, txt, png, fx在tMLMod里面包含-->
 		<AdditionalFiles Update="**/*.hjson;**/*.txt;**/*.png"
-						 ModPath="%(Identity)"
 						 Pack="true" />
 		<AdditionalFiles Include="**/*.ogg;**/*.wav;**/*.mp3;"
-						 ModPath="%(Identity)"
 						 Pack="true"
 						 Exclude="bin/**/*;obj/**/*" />
-		<AdditionalFiles Update="@(ModInfo)"
-						 Pack="false"/>
+		<AdditionalFiles Include="@(ModInfo)" />
 		<!--默认Publicizer-->
 		<Publicize Include="tModLoader;FNA" />
 	</ItemGroup>
+	<ItemDefinitionGroup>
+		<AdditionalFiles>
+			<ModPath>%(Identity)</ModPath>
+			<Pack>false</Pack>
+		</AdditionalFiles>
+		<ModEffect>
+			<ModPath>%(Identity)</ModPath>
+		</ModEffect>
+	</ItemDefinitionGroup>
 </Project>

@@ -15,9 +15,8 @@ public class PathGenerator : ISourceGenerator
 		}
 
 		var modName = context.GetProperty("ModName", context.Compilation.Assembly.Name);
-		var rootNamespce = context.GetProperty("RootNamespace", modName);
 		var typename = context.GetProperty("PathTypeName", "ModAsset");
-		var rootNamespace = context.GetProperty("PathNamespace", rootNamespce);
+		var rootNamespace = context.GetProperty("PathNamespace", modName);
 		var prefix = context.GetProperty("PathPrefix", string.Empty);
 		if (prefix.Length > 0 && prefix[^1] != '/')
 		{
@@ -43,7 +42,7 @@ public class PathGenerator : ISourceGenerator
 			""");
 
 		var paths = ScanResource(context, out var conflicts);
-		ResolveConflict(paths, conflicts);
+		ResolveConflict(context, paths, conflicts);
 
 		foreach (var member in paths.Values)
 		{
@@ -71,7 +70,7 @@ public class PathGenerator : ISourceGenerator
 				}
 				else
 				{
-					builder.AppendReduceOverlap(source, member, prefix);
+					builder.Append(source, member, prefix);
 				}
 			}
 		}
@@ -121,10 +120,14 @@ public class PathGenerator : ISourceGenerator
 		return paths;
 	}
 
-	private void ResolveConflict(Dictionary<string, PathMember> paths, Dictionary<string, List<PathMember>> conflicts)
+	private void ResolveConflict(in GeneratorExecutionContext context, Dictionary<string, PathMember> paths, Dictionary<string, List<PathMember>> conflicts)
 	{
-		static void RecurseResolve(List<PathMember> list)
+		static bool RecurseResolve(List<PathMember> list, int depth = 0)
 		{
+			if (depth > 16)
+			{
+				return false;
+			}
 			for (int i = 0; i < list.Count - 1; i++)
 			{
 				bool conflict = false;
@@ -142,10 +145,11 @@ public class PathGenerator : ISourceGenerator
 				if (conflict)
 				{
 					list[i] = PathMember.Increase(baseMember);
-					RecurseResolve(list);
+					RecurseResolve(list, depth + 1);
 					break;
 				}
 			}
+			return true;
 		}
 		foreach (var pair in conflicts)
 		{
@@ -155,7 +159,14 @@ public class PathGenerator : ISourceGenerator
 			{
 				list[i] = PathMember.Increase(list[i]);
 			}
-			RecurseResolve(list);
+			if (!RecurseResolve(list))
+			{
+				context.ReportDiagnostic(Diagnostic.Create(
+					Descriptors.MB0001,
+					Location.None,
+					string.Join(";", list.Select(s => s.Value.ToString()))));
+				paths.Remove(defaultName);
+			}
 			paths.Remove(defaultName);
 		}
 	}

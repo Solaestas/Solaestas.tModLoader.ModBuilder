@@ -132,11 +132,14 @@
   <data name="BuildEffect" xml:space="preserve">
     <value>Building Effect</value>
   </data>
+  <data name="BuildEffectTimeout" xml:space="preserve">
+    <value>Compiling Effect out of time</value>
+  </data>
   <data name="BuildMod" xml:space="preserve">
     <value>Building Mod: {0} -&gt; {1}</value>
   </data>
   <data name="BuildSuccess" xml:space="preserve">
-    <value>Build Success，Costs {0}</value>
+    <value>Build Success, Costs {0}</value>
   </data>
   <data name="DetectVersion" xml:space="preserve">
     <value>Detect tModLoader Version: {0}</value>
@@ -144,8 +147,11 @@
   <data name="EnableMod" xml:space="preserve">
     <value>Enable Mods: {0}, {1}</value>
   </data>
-  <data name="Output" xml:space="preserve">
-    <value>Output Path: {0}</value>
+  <data name="PackAsset" xml:space="preserve">
+    <value>Packing Assest</value>
+  </data>
+  <data name="PackSuccess" xml:space="preserve">
+    <value>Pack Success, Costs {0}</value>
   </data>
   <data name="Source" xml:space="preserve">
     <value>Source Path: {0}</value>

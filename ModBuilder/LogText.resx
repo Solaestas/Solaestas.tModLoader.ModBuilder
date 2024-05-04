@@ -147,8 +147,11 @@
   <data name="EnableMod" xml:space="preserve">
     <value>启用模组 {0}, {1}</value>
   </data>
-  <data name="Output" xml:space="preserve">
-    <value>输出路径 {0}</value>
+  <data name="PackAsset" xml:space="preserve">
+    <value>开始打包资源文件</value>
+  </data>
+  <data name="PackSuccess" xml:space="preserve">
+    <value>打包成功，用时 {0}</value>
   </data>
   <data name="Source" xml:space="preserve">
     <value>源代码路径 {0}</value>

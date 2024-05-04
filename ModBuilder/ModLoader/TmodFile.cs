@@ -1,4 +1,3 @@
-#pragma warning disable CS8602 // 解引用可能出现空引用。
 #pragma warning disable CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。
 using System.Collections;
 using System.Collections.Concurrent;
@@ -23,7 +22,7 @@ public class TmodFile(string path, string name, Version version) : IEnumerable<T
 		public int CompressedLength { get; } = compressedLength;
 
 		// intended to be readonly, but unfortunately no ReadOnlySpan on .NET 4.5
-		public byte[]? CachedBytes { get; } = cachedBytes;
+		public byte[]? CachedBytes { get; set; } = cachedBytes;
 
 		public bool IsCompressed => Length != CompressedLength;
 	}
@@ -110,7 +109,7 @@ public class TmodFile(string path, string name, Version version) : IEnumerable<T
 		}
 	}
 
-	public void Save(BuildInfo info)
+	public void Save(BuildInfo info, FileStream assetPack)
 	{
 		if (fileStream != null)
 		{
@@ -133,31 +132,25 @@ public class TmodFile(string path, string name, Version version) : IEnumerable<T
 			writer.Write(Name);
 			writer.Write(Version.ToString());
 
-			// write file table file count file-entries: filename uncompressed file size compressed
-			// file size (stored size)
-			fileTable = files.Values.ToArray();
-			writer.Write(fileTable.Length);
+			using var reader = new BinaryReader(assetPack);
+			int length = reader.ReadInt32();
+			int tableSize = reader.ReadInt32();
+			int dataSize = reader.ReadInt32();
 
+			fileTable = [.. files.Values];
+			writer.Write(length + fileTable.Length);
+			assetPack.CopyTo(fileStream, tableSize);
 			foreach (var f in fileTable)
 			{
-				if (f.CompressedLength != f.CachedBytes.Length)
-				{
-					throw new Exception($"CompressedLength ({f.CompressedLength}) != cachedBytes.Length ({f.CachedBytes.Length}): {f.Name}");
-				}
-
 				writer.Write(f.Name);
 				writer.Write(f.Length);
 				writer.Write(f.CompressedLength);
 			}
 
-			// write compressed files and update offsets
-			int offset = (int)fileStream.Position; // offset starts at end of file table
+			assetPack.CopyTo(fileStream, dataSize);
 			foreach (var f in fileTable)
 			{
 				writer.Write(f.CachedBytes);
-
-				f.Offset = offset;
-				offset += f.CompressedLength;
 			}
 
 			// update hash
@@ -176,6 +169,38 @@ public class TmodFile(string path, string name, Version version) : IEnumerable<T
 
 		fileStream = null;
 	}
+
+	public void WriteFileTable(FileStream file)
+	{
+		using var writer = new BinaryWriter(file);
+		fileTable = [.. files.Values];
+		writer.Write(fileTable.Length);
+
+		// Table size and data size
+		int sizePos = (int)file.Position;
+		writer.Write(default(int));
+		writer.Write(default(int));
+
+		foreach (var f in fileTable)
+		{
+			writer.Write(f.Name);
+			writer.Write(f.Length);
+			writer.Write(f.CompressedLength);
+		}
+
+		int tableSize = (int)file.Position - sizePos - sizeof(int) * 2;
+
+		// write compressed files and update offsets
+		foreach (var f in fileTable)
+		{
+			writer.Write(f.CachedBytes);
+		}
+
+		int dataSize = (int)file.Position - tableSize;
+
+		file.Position = sizePos;
+		writer.Write(tableSize);
+		writer.Write(dataSize);
+	}
 }
 #pragma warning restore CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。
-#pragma warning restore CS8602 // 解引用可能出现空引用。

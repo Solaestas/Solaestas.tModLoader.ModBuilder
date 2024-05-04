@@ -6,6 +6,6 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Solaestas.tModLoader.ModBuilder"
-						  Version="1.5.3" />
+						  Version="1.5.4" />
 	</ItemGroup>
 </Project>

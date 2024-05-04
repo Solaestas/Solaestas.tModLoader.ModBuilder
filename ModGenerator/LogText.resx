@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="MB0001Message" xml:space="preserve">
-    <value>{0} 文件名相同，将自动添加前缀</value>
+    <value>{0} 文件名相同</value>
   </data>
   <data name="MB0001Title" xml:space="preserve">
     <value>文件名相同</value>

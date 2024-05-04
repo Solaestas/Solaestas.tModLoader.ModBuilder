@@ -7,10 +7,23 @@
 			   AssemblyFile="$(Solaestas-TaskPath)" />
 	<UsingTask TaskName="BuildMod"
 			   AssemblyFile="$(Solaestas-TaskPath)" />
+	<UsingTask TaskName="PackAsset"
+			   AssemblyFile="$(Solaestas-TaskPath)" />
 	<UsingTask TaskName="EnableMod"
 			   AssemblyFile="$(Solaestas-TaskPath)" />
 	<UsingTask TaskName="ReadConfig"
 			   AssemblyFile="$(Solaestas-TaskPath)" />
+
+	<PropertyGroup Condition="$(EnableModBuilder)">
+		<!--Similar to https://github.com/dotnet/project-system/issues/9421-->
+		<DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
+	</PropertyGroup>
+	<ItemGroup Condition="$(CompileEffect)">
+		<UpToDateCheckInput Include="@(ModEffect)"
+							Set="Effects" />
+		<UpToDateCheckOutput Include="@(ModEffect->'$(OutputPath)Assets\%(RelativeDir)%(Filename).xnb')"
+							 Set="Effects" />
+	</ItemGroup>
 
 	<Target Name="CheckImport"
 			BeforeTargets="InitModBuilder">
@@ -35,29 +48,27 @@
 			<Reference Update="$(tMLLibraryPath)/**/*.dll;$(tMLSteamPath)$(tMLPath)"
 					   Private="false" />
 		</ItemGroup>
-		<PropertyGroup Condition="$(ProcessResource)">
-			<!--处理资源文件-->
+		<PropertyGroup Condition="$(EnableModBuilder)">
 			<ModOutput>$(ModDirectory)$(AssemblyName).tmod</ModOutput>
-			<!--默认模组名-->
-			<ModName Condition="$(ModName) == ''">$(AssemblyName)</ModName>
+			<AssetPack>$(BaseIntermediateOutputPath)asset.cache</AssetPack>
 		</PropertyGroup>
-		<ItemGroup Condition="$(ProcessResource)">
-			<AdditionalFiles Remove="**/*.fx" />
+		<ItemGroup Condition="$(CompileEffect)">
 			<EffectOutputs Include="@(ModEffect->'$(OutputPath)Assets\%(RelativeDir)%(Filename).xnb')"
 						   ModPath="$([System.IO.Path]::ChangeExtension(%(ModPath), '.xnb'))" />
 			<AdditionalFiles Include="@(EffectOutputs)"
 							 ModPath="%(ModPath)"
 							 Pack="true" />
-			<UpToDateCheckInput Include="@(ModEffect)"
-								Set="Effects" />
-			<UpToDateCheckOutput Include="@(EffectOutputs)"
-								 Set="Effects" />
 		</ItemGroup>
-		<ItemGroup Condition="$(EnableModBuilder)">
-			<ModReference Include="$(OutputPath)*.dll" Exclude="$(OutputPath)$(AssemblyName).dll" />
-			<UpToDateCheckBuilt Include="$(ModOutput)" />
-			<UpToDateCheckInput Include="@(ModReference)" />
+		<ItemGroup>
+			<ModReference Include="$(OutputPath)*.dll"
+						  Exclude="$(ModAssembly)" />
 		</ItemGroup>
+		<PropertyGroup>
+			<DebugSymbol>$(OutputPath)$(AssemblyName).pdb</DebugSymbol>
+			<ModAssembly>$(OutputPath)$(AssemblyName).dll</ModAssembly>
+			<ModName Condition="$(ModName) == ''">$(AssemblyName)</ModName>
+			<PathNamespace Condition="$(PathNamespace) == ''">$(RootNamespace)</PathNamespace>
+		</PropertyGroup>
 	</Target>
 
 	<Target Name="GenerateConfig"
@@ -71,8 +82,8 @@
 	</Target>
 
 	<Target Name="BuildEffect"
-			Condition="$(ProcessResource)"
-			AfterTargets="Compile"
+			Condition="$(CompileEffect)"
+			BeforeTargets="Build"
 			Inputs="@(ModEffect)"
 			Outputs="@(EffectOutputs)">
 		<BuildEffect BuilderDirectory="$(Solaestas-ShaderBuilderDirectory)"
@@ -85,17 +96,28 @@
 		</BuildEffect>
 	</Target>
 
+	<Target Name="PackAsset"
+			Condition="$(EnableModBuilder)"
+			BeforeTargets="BuildMod"
+			Inputs="@(AdditionalFiles)"
+			Outputs="$(AssetPack)">
+		<PackAsset Assets="@(AdditionalFiles)"
+				   OutputPath="$(AssetPack)" />
+	</Target>
+
 	<!--覆盖tML编译-->
 	<Target Name="BuildMod"
-			Condition="$(EnableModBuilder)" 
+			Condition="$(EnableModBuilder)"
 			AfterTargets="Build"
-			Inputs="$(Solaestas-ConfigPath);@(AdditionalFiles);@(Compile);@(ModInfo);@(ModReference)"
+			Inputs="$(AssetPack);@(ModInfo);@(ModReference);$(ModAssembly);$(DebugSymbol)"
 			Outputs="$(ModOutput)">
 		<BuildMod ModSourceDirectory="$(MSBuildProjectDirectory)\"
 				  ModName="$(ModName)"
-				  OutputDirectory="$(OutputPath)"
-				  ResourceFiles="@(AdditionalFiles)"
+				  Asset="$(AssetPack)"
 				  ModDirectory="$(ModDirectory)"
+				  ModAssembly="$(ModAssembly)"
+				  DebugSymbol="$(DebugSymbol)"
+				  ModReference="@(ModReference)"
 				  BuildIdentifier="$(BuildIdentifier)"
 				  TmlVersion="$(TmlVersion)" />
 	</Target>
@@ -111,7 +133,7 @@
 
 	<Target Name="CleanModBuilder"
 			BeforeTargets="Clean">
-		<Delete Files="$(Solaestas-ConfigPath)" />
+		<Delete Files="$(Solaestas-ConfigPath);$(AssetPack)" />
 		<Delete Files="@(EffectOutputs)" />
 	</Target>
 </Project>

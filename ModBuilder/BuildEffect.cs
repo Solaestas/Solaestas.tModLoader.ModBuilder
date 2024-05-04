@@ -85,6 +85,7 @@ public class BuildEffect : Task
 			using var proc = Process.Start(info);
 
 			var outputCloseEvent = new TaskCompletionSource<bool>();
+			bool hasError = false;
 			proc.OutputDataReceived += (s, e) =>
 			{
 				if (e.Data == null)
@@ -104,6 +105,7 @@ public class BuildEffect : Task
 				else if (args is BuildErrorEventArgs error)
 				{
 					BuildEngine.LogErrorEvent(error);
+					hasError = true;
 				}
 			};
 			var errorCloseEvent = new TaskCompletionSource<bool>();
@@ -141,7 +143,9 @@ public class BuildEffect : Task
 				return false;
 			}
 
-			return proc.ExitCode == 0;
+			hasError |= proc.ExitCode != 0;
+
+			return hasError;
 		}
 	}
 }

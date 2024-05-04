@@ -34,5 +34,6 @@ public class LocalTestMod : Mod
 
 		// Print asset path
 		Logger.Info(ModAsset.Test_Path);
+		Logger.Info(ModAsset.TestFx_Path);
 	}
 }

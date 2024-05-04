@@ -10,10 +10,10 @@ public unsafe struct PathMember
 
 	private string _path;
 
-	// 应该不至于有这么长的路径吧
-	private fixed sbyte _slashBuffer[8];
-
 	private int _slashCount;
+
+	// 应该不至于有这么长的路径吧
+	private fixed sbyte _slashBuffer[16];
 
 	public PathMember(string path)
 	{

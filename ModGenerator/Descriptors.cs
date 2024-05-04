@@ -15,7 +15,7 @@ public static class Descriptors
 		new LocalizableResourceString(nameof(LogText.MB0001Title), LogText.ResourceManager, typeof(LogText)),
 		new LocalizableResourceString(nameof(LogText.MB0001Message), LogText.ResourceManager, typeof(LogText)),
 		Category,
-		DiagnosticSeverity.Info,
+		DiagnosticSeverity.Warning,
 		true
 	);
 

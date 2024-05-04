@@ -18,5 +18,4 @@
 	<ItemGroup>
 		<ProjectReference Include="../ModGenerator/ModGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 	</ItemGroup>
-
 </Project>
