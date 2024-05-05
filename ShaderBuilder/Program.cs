@@ -41,29 +41,46 @@ var buildItem = new BuildItem()
 var importContext = new XnaContentImporterContext(buildCoordinator, buildItem, logger);
 var processorContext = new XnaContentProcessorContext(buildCoordinator, buildItem, logger, settings.TargetPlatform, settings.TargetProfile, settings.BuildConfiguration);
 var contentCompiler = new ContentCompiler();
-foreach (var file in inputFiles)
+try
 {
-	var fileInfo = new FileInfo(file);
-	var output = @$"{outputDir}{Path.ChangeExtension(file, ".xnb")}";
-	if (File.GetLastWriteTimeUtc(file) < File.GetLastWriteTimeUtc(output))
+	Parallel.ForEach(inputFiles, file =>
 	{
-		helper.LogMessage(MessageImportance.Normal, "Skip {0}", file);
-		continue;
-	}
-	helper.LogMessage(MessageImportance.Normal, "Building {0} -> {1}", file, output);
-	try
-	{
+		var fileInfo = new FileInfo(file);
+		var output = @$"{outputDir}{Path.ChangeExtension(file, ".xnb")}";
+		if (File.GetLastWriteTimeUtc(file) < File.GetLastWriteTimeUtc(output))
+		{
+			helper.LogMessage(MessageImportance.Normal, "Skip {0}", file);
+			return;
+		}
+		helper.LogMessage(MessageImportance.Normal, "Building {0} -> {1}", file, output);
 		var input = importer.Import(file, importContext);
 		var content = processor.Process(input, processorContext);
 		var info = new FileInfo(output);
 		info.Directory.Create();
-		using var stream = info.Create();
-		contentCompiler.Compile(stream, content, settings.TargetPlatform, settings.TargetProfile, false, outputDir, outputDir);
-	}
-	catch (Exception ex)
-	{
-		helper.LogErrorFromException(ex);
-	}
+		int retry = 0;
+	Retry:
+		try
+		{
+			using var stream = info.Create();
+			contentCompiler.Compile(stream, content, settings.TargetPlatform, settings.TargetProfile, false, outputDir, outputDir);
+		}
+		catch (IOException ex)
+		{
+			if (++retry > 10)
+			{
+				throw ex;
+			}
+			helper.LogWarningFromException(ex);
+			helper.LogMessage("Retrying...");
+			Thread.Sleep(TimeSpan.FromMilliseconds(10));
+			goto Retry;
+		}
+	});
+}
+catch (Exception ex)
+{
+	helper.LogErrorFromException(ex.InnerException);
+	return -1;
 }
 
 return 0;

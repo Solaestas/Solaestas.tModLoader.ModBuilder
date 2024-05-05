@@ -14,7 +14,7 @@ public class BuildEffect : Task
 	/// 输入文件
 	/// </summary>
 	[Required]
-	public ITaskItem[] InputFiles { get; set; } = default!;
+	public string InputFiles { get; set; } = default!;
 
 	/// <summary>
 	/// 中间文件夹
@@ -61,7 +61,7 @@ public class BuildEffect : Task
 		var filename = $"{BuilderDirectory}ShaderBuilder.exe";
 		var args = new List<string>()
 		{
-			string.Join(";", InputFiles.Select(i => i.ItemSpec)),
+			string.Join(";", InputFiles),
 			IntermediateDirectory,
 			OutputDirectory,
 			TargetPlatform,
@@ -145,7 +145,7 @@ public class BuildEffect : Task
 
 			hasError |= proc.ExitCode != 0;
 
-			return hasError;
+			return !hasError;
 		}
 	}
 }
