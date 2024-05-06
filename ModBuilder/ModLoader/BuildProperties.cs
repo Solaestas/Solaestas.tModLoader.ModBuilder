@@ -29,7 +29,7 @@ public class BuildProperties
 
 	public bool IncludeSource = false;
 
-	public ModReference[] ModReferences = Array.Empty<ModReference>();
+	public ModReference[] ModReferences = [];
 
 	public bool NoCompile = false;
 
@@ -39,14 +39,14 @@ public class BuildProperties
 
 	// this mod will load after any mods in this list sortAfter includes (mod|weak)References that
 	// are not in sortBefore
-	public string[] SortAfter = Array.Empty<string>();
+	public string[] SortAfter = [];
 
 	// this mod will load before any mods in this list
-	public string[] SortBefore = Array.Empty<string>();
+	public string[] SortBefore = [];
 
 	public Version Version = new(1, 0);
 
-	public ModReference[] WeakReferences = Array.Empty<ModReference>();
+	public ModReference[] WeakReferences = [];
 
 	public static BuildProperties ReadBuildFile(string modDir, BuildInfo info)
 	{

@@ -1,4 +1,5 @@
 #pragma warning disable CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。
+using System.Buffers;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.IO.Compression;
@@ -22,7 +23,7 @@ public class TmodFile(string path, string name, Version version) : IEnumerable<T
 		public int CompressedLength { get; } = compressedLength;
 
 		// intended to be readonly, but unfortunately no ReadOnlySpan on .NET 4.5
-		public byte[]? CachedBytes { get; set; } = cachedBytes;
+		public byte[]? CachedBytes { get; } = cachedBytes;
 
 		public bool IsCompressed => Length != CompressedLength;
 	}
@@ -139,7 +140,9 @@ public class TmodFile(string path, string name, Version version) : IEnumerable<T
 
 			fileTable = [.. files.Values];
 			writer.Write(length + fileTable.Length);
-			assetPack.CopyTo(fileStream, tableSize);
+			var buffer = ArrayPool<byte>.Shared.Rent(Math.Max(tableSize, dataSize));
+			reader.Read(buffer, 0, tableSize);
+			writer.Write(buffer, 0, tableSize);
 			foreach (var f in fileTable)
 			{
 				writer.Write(f.Name);
@@ -147,7 +150,9 @@ public class TmodFile(string path, string name, Version version) : IEnumerable<T
 				writer.Write(f.CompressedLength);
 			}
 
-			assetPack.CopyTo(fileStream, dataSize);
+			reader.Read(buffer, 0, dataSize);
+			writer.Write(buffer, 0, dataSize);
+			ArrayPool<byte>.Shared.Return(buffer);
 			foreach (var f in fileTable)
 			{
 				writer.Write(f.CachedBytes);
@@ -181,22 +186,21 @@ public class TmodFile(string path, string name, Version version) : IEnumerable<T
 		writer.Write(default(int));
 		writer.Write(default(int));
 
+		int tableStart = (int)file.Position;
 		foreach (var f in fileTable)
 		{
 			writer.Write(f.Name);
 			writer.Write(f.Length);
 			writer.Write(f.CompressedLength);
 		}
+		int tableSize = (int)file.Position - tableStart;
 
-		int tableSize = (int)file.Position - sizePos - sizeof(int) * 2;
-
-		// write compressed files and update offsets
+		int dataStart = (int)file.Position;
 		foreach (var f in fileTable)
 		{
 			writer.Write(f.CachedBytes);
 		}
-
-		int dataSize = (int)file.Position - tableSize;
+		int dataSize = (int)file.Position - dataStart;
 
 		file.Position = sizePos;
 		writer.Write(tableSize);

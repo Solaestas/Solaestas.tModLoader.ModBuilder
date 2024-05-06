@@ -59,16 +59,16 @@
 							 ModPath="%(ModPath)"
 							 Pack="true" />
 		</ItemGroup>
-		<ItemGroup>
-			<ModReference Include="$(OutputPath)*.dll"
-						  Exclude="$(ModAssembly)" />
-		</ItemGroup>
 		<PropertyGroup>
 			<DebugSymbol>$(OutputPath)$(AssemblyName).pdb</DebugSymbol>
 			<ModAssembly>$(OutputPath)$(AssemblyName).dll</ModAssembly>
 			<ModName Condition="$(ModName) == ''">$(AssemblyName)</ModName>
 			<PathNamespace Condition="$(PathNamespace) == ''">$(RootNamespace)</PathNamespace>
 		</PropertyGroup>
+		<ItemGroup>
+			<ModReference Include="$(OutputPath)*.dll"
+						  Exclude="$(ModAssembly)" />
+		</ItemGroup>
 	</Target>
 
 	<Target Name="GenerateConfig"
