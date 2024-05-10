@@ -120,6 +120,9 @@
   <data name="AddAssembly" xml:space="preserve">
     <value>Add Assembly: {0} -&gt; {1}</value>
   </data>
+  <data name="AddDebugSymbol" xml:space="preserve">
+    <value>Add Debug Symbol: {0} -&gt; {1}</value>
+  </data>
   <data name="AddReference" xml:space="preserve">
     <value>Add Reference: {0} -&gt; {1}</value>
   </data>

@@ -59,9 +59,10 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 
 		// Add dll and pdb
 		tmod.AddFile($"{ModName}.dll", ModAssembly.ItemSpec);
-		Log.LogMessage(MessageImportance.Normal, LogText.AddAssembly, ModName, ModAssembly.ItemSpec);
+		Log.LogMessage(MessageImportance.Normal, LogText.AddAssembly, $"{ModName}.dll", ModAssembly.ItemSpec);
 		tmod.AddFile($"{ModName}.pdb", DebugSymbol.ItemSpec);
 		property.EacPath = DebugSymbol.ItemSpec;
+		Log.LogMessage(MessageImportance.Normal, LogText.AddDebugSymbol, $"{ModName}.pdb", ModAssembly.ItemSpec);
 		foreach(var lib in ModReference)
 		{
 			var filename = lib.GetMetadata("Filename");
@@ -70,8 +71,9 @@ public class BuildMod : Microsoft.Build.Utilities.Task
 				continue;
 			}
 			dllref.Add(filename);
-			tmod.AddFile($"lib\\{filename}.dll", lib.ItemSpec);
-			Log.LogMessage(MessageImportance.Normal, LogText.AddReference, filename, lib.ItemSpec);
+			string path = $"lib\\{filename}.dll";
+			tmod.AddFile(path, lib.ItemSpec);
+			Log.LogMessage(MessageImportance.Normal, LogText.AddReference, path, lib.ItemSpec);
 		}
 
 		// Add Info

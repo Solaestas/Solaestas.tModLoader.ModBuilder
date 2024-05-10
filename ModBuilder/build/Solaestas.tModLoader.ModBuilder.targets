@@ -60,15 +60,9 @@
 							 Pack="true" />
 		</ItemGroup>
 		<PropertyGroup>
-			<DebugSymbol>$(OutputPath)$(AssemblyName).pdb</DebugSymbol>
-			<ModAssembly>$(OutputPath)$(AssemblyName).dll</ModAssembly>
 			<ModName Condition="$(ModName) == ''">$(AssemblyName)</ModName>
 			<PathNamespace Condition="$(PathNamespace) == ''">$(RootNamespace)</PathNamespace>
 		</PropertyGroup>
-		<ItemGroup>
-			<ModReference Include="$(OutputPath)*.dll"
-						  Exclude="$(ModAssembly)" />
-		</ItemGroup>
 	</Target>
 
 	<Target Name="GenerateConfig"
@@ -96,10 +90,30 @@
 		</BuildEffect>
 	</Target>
 
+	<Target Name="ModHash" AfterTargets="Build" BeforeTargets="PackAsset">
+		<Hash ItemsToHash="@(AdditionalFiles)">
+			<Output TaskParameter="HashResult"
+					PropertyName="AssetHash" />
+		</Hash>
+		<WriteLinesToFile File="$(BaseIntermediateOutputPath)AssetInputs.cache"
+						  Lines="$(AssetHash)"
+						  Overwrite="true"
+						  WriteOnlyWhenDifferent="true"/>
+		<Hash ItemsToHash="@(ModInfo);@(UserRuntimeAssembly)">
+			<Output TaskParameter="HashResult"
+					PropertyName="ModHash" />
+		</Hash>
+		<WriteLinesToFile File="$(BaseIntermediateOutputPath)ModInputs.cache"
+						  Lines="$(ModHash)"
+						  Overwrite="true"
+						  WriteOnlyWhenDifferent="true"/>
+	</Target>
+
 	<Target Name="PackAsset"
 			Condition="$(EnableModBuilder)"
 			BeforeTargets="BuildMod"
-			Inputs="@(AdditionalFiles)"
+			AfterTargets="Build"
+			Inputs="@(AdditionalFiles);$(BaseIntermediateOutputPath)AssetInputs.cache"
 			Outputs="$(AssetPack)">
 		<PackAsset Assets="@(AdditionalFiles)"
 				   OutputPath="$(AssetPack)" />
@@ -108,15 +122,15 @@
 	<!--覆盖tML编译-->
 	<Target Name="BuildMod"
 			Condition="$(EnableModBuilder)"
-			AfterTargets="Build"
-			Inputs="$(AssetPack);@(ModInfo);@(ModReference);$(ModAssembly);$(DebugSymbol)"
+			AfterTargets="Build;CopyFilesToOutputDirectory"
+			Inputs="$(AssetPack);@(ModInfo);@(UserRuntimeAssembly);@(MainAssembly);@(_DebugSymbolsOutputPath);$(BaseIntermediateOutputPath)ModInputs.cache"
 			Outputs="$(ModOutput)">
 		<BuildMod ModSourceDirectory="$(MSBuildProjectDirectory)\"
 				  ModName="$(ModName)"
 				  Asset="$(AssetPack)"
 				  ModDirectory="$(ModDirectory)"
-				  ModAssembly="$(ModAssembly)"
-				  DebugSymbol="$(DebugSymbol)"
+				  ModAssembly="@(MainAssembly)"
+				  DebugSymbol="@(_DebugSymbolsOutputPath)"
 				  ModReference="@(ModReference)"
 				  BuildIdentifier="$(BuildIdentifier)"
 				  TmlVersion="$(TmlVersion)" />

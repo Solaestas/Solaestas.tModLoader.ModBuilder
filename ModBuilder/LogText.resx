@@ -120,6 +120,9 @@
   <data name="AddAssembly" xml:space="preserve">
     <value>添加模组程序集 {0} -&gt; {1}</value>
   </data>
+  <data name="AddDebugSymbol" xml:space="preserve">
+    <value>添加符号文件 {0} -&gt; {1}</value>
+  </data>
   <data name="AddReference" xml:space="preserve">
     <value>添加引用程序集 {0} -&gt; {1}</value>
   </data>
