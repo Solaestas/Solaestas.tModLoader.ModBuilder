@@ -42,9 +42,16 @@ public class PathGenerator : ISourceGenerator
 			""");
 
 		var paths = ScanResource(context, out var conflicts);
-		ResolveConflict(context, paths, conflicts);
+		TryFullName(paths, conflicts);
+		TryAddDepth(paths, conflicts);
+		foreach (var con in conflicts.Values)
+		{
+			context.ReportDiagnostic(Diagnostic.Create(Descriptors.MB0001, Location.None, string.Join(
+				", ",
+				con.Select(s => s.Value.ToString()))));
+		}
 
-		foreach (var member in paths.Values)
+		foreach (var member in paths)
 		{
 			if (!CheckValid(member.Name))
 			{
@@ -54,32 +61,11 @@ public class PathGenerator : ISourceGenerator
 			builder.Append(source, member, prefix);
 		}
 
-		foreach (var list in conflicts.Values)
-		{
-			var overlap = PathMember.HasOverlap(list);
-			foreach (var member in list)
-			{
-				if (!CheckValid(member.Name))
-				{
-					context.ReportDiagnostic(Diagnostic.Create(Descriptors.MB0002, Location.None, member.Path));
-					continue;
-				}
-				if (overlap)
-				{
-					builder.AppendReduceOverlap(source, member, prefix);
-				}
-				else
-				{
-					builder.Append(source, member, prefix);
-				}
-			}
-		}
-
 		source.AppendLine("}");
 		context.AddSource($"{typename}.g.cs", source.ToString());
 	}
 
-	private Dictionary<string, PathMember> ScanResource(in GeneratorExecutionContext context, out Dictionary<string, List<PathMember>> conflicts)
+	private List<PathMember> ScanResource(in GeneratorExecutionContext context, out Dictionary<string, List<PathMember>> conflicts)
 	{
 		Dictionary<string, PathMember> paths = [];
 		conflicts = [];
@@ -117,12 +103,106 @@ public class PathGenerator : ISourceGenerator
 			paths.Add(defaultName, member);
 		}
 
-		return paths;
+		foreach (var key in conflicts.Keys)
+		{
+			paths.Remove(key);
+		}
+
+		return [.. paths.Values];
 	}
 
-	private void ResolveConflict(in GeneratorExecutionContext context, Dictionary<string, PathMember> paths, Dictionary<string, List<PathMember>> conflicts)
+	/// <summary>
+	/// 使用全名来避免部分重名
+	/// </summary>
+	/// <param name="context"></param>
+	/// <param name="paths"></param>
+	/// <param name="conflicts"></param>
+	public static void TryFullName(List<PathMember> paths, Dictionary<string, List<PathMember>> conflicts)
 	{
-		static bool RecurseResolve(List<PathMember> list, int depth = 0)
+		foreach (var pair in conflicts.ToArray())
+		{
+			var list = pair.Value;
+			int cannot = 0;
+
+			for (int i = 0; i < list.Count - 1; i++)
+			{
+				// n位set表示第n个能不用全名解决重名问题
+				for (int j = i + 1; j < list.Count; j++)
+				{
+					if (list[i].FullName.SequenceEqual(list[j].FullName))
+					{
+						cannot |= 1 << i;
+						cannot |= 1 << j;
+						break;
+					}
+				}
+			}
+
+			// 翻转cannot，得到能使用全名解决重名的位
+			int can = cannot ^ ~(-1 << list.Count);
+
+			// 全名无法解决重名
+			if (can == 0)
+			{
+				continue;
+			}
+
+			// 全部能通过使用全名解决重名
+			if (cannot == 0)
+			{
+				paths.AddRange(list.Select(s => s with
+				{
+					Style = PathStyle.FullName,
+				}));
+				conflicts.Remove(pair.Key);
+				continue;
+			}
+
+			// 只有一个全名与其他不同
+			if((can & (can - 1)) == 0)
+			{
+				continue;
+			}
+
+			// 部分全名能解决的
+			for (int i = list.Count - 1; i >= 0; i--)
+			{
+				if ((can & (1 << i)) != 0)
+				{
+					paths.Add(list[i] with { Style = PathStyle.FullName });
+					list.RemoveAt(i);
+				}
+			}
+		}
+	}
+
+	/// <summary>
+	/// 添加前缀来避免重名
+	/// </summary>
+	/// <param name="context"></param>
+	/// <param name="paths"></param>
+	/// <param name="conflicts"></param>
+	public static void TryAddDepth(List<PathMember> paths, Dictionary<string, List<PathMember>> conflicts)
+	{
+		foreach (var pair in conflicts.ToArray())
+		{
+			var list = pair.Value;
+			for (int i = 0; i < list.Count; i++)
+			{
+				list[i] = PathMember.Increase(list[i]);
+			}
+			if (Recurse(list))
+			{
+				bool overlap = PathMember.HasOverlap(list);
+				foreach (var member in list)
+				{
+					paths.Add(overlap ? member with { Style = PathStyle.Reduce } : member);
+				}
+				conflicts.Remove(pair.Key);
+			}
+		}
+
+		static bool Recurse(List<PathMember> list, int depth = 0)
 		{
 			if (depth > 16)
 			{
@@ -145,42 +225,23 @@ public class PathGenerator : ISourceGenerator
 				if (conflict)
 				{
 					list[i] = PathMember.Increase(baseMember);
-					RecurseResolve(list, depth + 1);
+					Recurse(list, depth + 1);
 					break;
 				}
 			}
 			return true;
 		}
-		foreach (var pair in conflicts)
-		{
-			var defaultName = pair.Key;
-			var list = pair.Value;
-			for (int i = 0; i < list.Count; i++)
-			{
-				list[i] = PathMember.Increase(list[i]);
-			}
-			if (!RecurseResolve(list))
-			{
-				context.ReportDiagnostic(Diagnostic.Create(
-					Descriptors.MB0001,
-					Location.None,
-					string.Join(";", list.Select(s => s.Value.ToString()))));
-				paths.Remove(defaultName);
-			}
-			paths.Remove(defaultName);
-		}
 	}
 
-	private bool CheckValid(ReadOnlySpan<char> name)
+	public static bool CheckValid(ReadOnlySpan<char> name)
 	{
 		for (int i = 0; i < name.Length; i++)
 		{
-			// 反斜杠后续替换为下划线
 			var ch = name[i];
 			if (ch is (>= 'a' and <= 'z')
 				or (>= 'A' and <= 'Z')
 				or (>= '0' and <= '9')
-				or '_' or '\\')
+				or '_' or '\\' or '/' or '.' or ' ')
 			{
 				continue;
 			}

@@ -91,6 +91,10 @@
 	</Target>
 
 	<Target Name="ModHash" AfterTargets="Build" BeforeTargets="PackAsset">
+		<ItemGroup>
+			<ModReference Include="@(FileWritesShareable)"
+						  Exclude="**\*.pdb" />
+		</ItemGroup>
 		<Hash ItemsToHash="@(AdditionalFiles)">
 			<Output TaskParameter="HashResult"
 					PropertyName="AssetHash" />
@@ -99,7 +103,7 @@
 						  Lines="$(AssetHash)"
 						  Overwrite="true"
 						  WriteOnlyWhenDifferent="true"/>
-		<Hash ItemsToHash="@(ModInfo);@(UserRuntimeAssembly)">
+		<Hash ItemsToHash="@(ModInfo);@(ModReference)">
 			<Output TaskParameter="HashResult"
 					PropertyName="ModHash" />
 		</Hash>
@@ -123,7 +127,7 @@
 	<Target Name="BuildMod"
 			Condition="$(EnableModBuilder)"
 			AfterTargets="Build;CopyFilesToOutputDirectory"
-			Inputs="$(AssetPack);@(ModInfo);@(UserRuntimeAssembly);@(MainAssembly);@(_DebugSymbolsOutputPath);$(BaseIntermediateOutputPath)ModInputs.cache"
+			Inputs="$(AssetPack);@(ModInfo);@(ModReference);@(MainAssembly);@(_DebugSymbolsOutputPath);$(BaseIntermediateOutputPath)ModInputs.cache"
 			Outputs="$(ModOutput)">
 		<BuildMod ModSourceDirectory="$(MSBuildProjectDirectory)\"
 				  ModName="$(ModName)"

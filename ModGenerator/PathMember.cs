@@ -4,6 +4,8 @@ public unsafe struct PathMember
 {
 	private AssetType _assetType;
 
+	private PathStyle _style;
+
 	private int _depth;
 
 	private int _extension;
@@ -21,9 +23,10 @@ public unsafe struct PathMember
 		_depth = 1;
 		_slashBuffer[0] = -1;
 		_slashCount = 1;
+		_style = PathStyle.Default;
 		for (int i = 0; i < path.Length; i++)
 		{
-			if (path[i] == '\\')
+			if (path[i] is '\\' or '/')
 			{
 				_slashBuffer[_slashCount++] = (sbyte)i;
 			}
@@ -51,6 +54,9 @@ public unsafe struct PathMember
 
 	public readonly int Depth => _depth;
 
+	/// <summary>
+	/// 文件名加上对应深度的文件夹前缀，不包括后缀名
+	/// </summary>
 	public readonly ReadOnlySpan<char> Name
 	{
 		get
@@ -61,8 +67,26 @@ public unsafe struct PathMember
 		}
 	}
 
+	/// <summary>
+	/// 文件名加上对应深度的文件夹前缀，包括后缀名
+	/// </summary>
+	public readonly ReadOnlySpan<char> FullName
+	{
+		get
+		{
+			int start = _slashBuffer[_slashCount - _depth] + 1;
+			int length = _path.Length - start;
+			return _path.AsSpan(start, length);
+		}
+	}
+
+	public PathStyle Style { readonly get => _style; set => _style = value; }
+
 	public readonly string Path => _path;
 
+	/// <summary>
+	/// 文件路径，如果是Asset则不包含后缀名
+	/// </summary>
 	public readonly ReadOnlySpan<char> Value
 	{
 		get
@@ -88,6 +112,11 @@ public unsafe struct PathMember
 
 	public static implicit operator PathMember(string path) => new PathMember(path);
 
+	/// <summary>
+	/// 提高深度
+	/// </summary>
+	/// <param name="member"></param>
+	/// <returns></returns>
 	public static PathMember Increase(PathMember member)
 	{
 		if (member._depth < member._slashCount)
@@ -97,11 +126,21 @@ public unsafe struct PathMember
 		return member;
 	}
 
+	/// <summary>
+	/// 返回对应深度的文件夹名称
+	/// </summary>
+	/// <param name="depth"></param>
+	/// <returns></returns>
 	public readonly ReadOnlySpan<char> Slice(int depth)
 	{
 		int start = _slashBuffer[_slashCount - depth] + 1;
 		int end = depth == 1 ? _extension : _slashBuffer[_slashCount - depth + 1];
 		int length = end - start;
 		return _path.AsSpan(start, length);
+	}
+
+	public override readonly string ToString()
+	{
+		return $"Path: {_path}, Depth: {_depth}, Style: {_style}, Asset: {_assetType}";
 	}
 }

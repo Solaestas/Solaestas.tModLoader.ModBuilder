@@ -8,6 +8,7 @@
 		<Nullable>enable</Nullable>
 		<NeutralLanguage>zh-CN</NeutralLanguage>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<PackVersion>1.5.9</PackVersion>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="PolySharp"

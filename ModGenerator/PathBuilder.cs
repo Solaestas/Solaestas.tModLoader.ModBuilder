@@ -14,12 +14,35 @@ public class PathBuilder
 
 	public void Append(StringBuilder builder, in PathMember member, string prefix)
 	{
-		var name = member.Name;
-		var buffer = nameBuffer.AsSpan(0, name.Length);
-		name.CopyTo(buffer);
-		Replace(buffer, '\\', '_');
-		Replace(buffer, '/', '_');
-		nameLength = name.Length;
+		Span<char> buffer;
+		ReadOnlySpan<char> name;
+		switch (member.Style)
+		{
+			case PathStyle.Default:
+				name = member.Name;
+				nameLength = name.Length;
+				buffer = nameBuffer.AsSpan(0, nameLength);
+				name.CopyTo(buffer);
+				break;
+			case PathStyle.FullName:
+				name = member.FullName;
+				nameLength = name.Length;
+				buffer = nameBuffer.AsSpan(0, nameLength);
+				name.CopyTo(buffer);
+				break;
+			case PathStyle.Reduce:
+				var identity = member.Slice(member.Depth);
+				name = member.Slice(1);
+				nameLength = identity.Length + name.Length + 1;
+				buffer = nameBuffer.AsSpan(0, nameLength);
+				identity.CopyTo(buffer);
+				buffer[identity.Length] = '_';
+				name.CopyTo(buffer[(identity.Length + 1)..]);
+				break;
+			default:
+				throw new ArgumentException("Unknown PathStyle");
+		}
+		Replace(buffer, ['\\', '/', '.', ' '], '_');
 
 		var value = member.Value;
 		prefix.CopyTo(0, valueBuffer, 0, prefix.Length);
@@ -31,25 +54,18 @@ public class PathBuilder
 		AppendInternal(builder, member);
 	}
 
-	public void AppendReduceOverlap(StringBuilder builder, in PathMember member, string prefix)
+	private static void Replace(Span<char> buffer, Span<char> oldChars, char newChar)
 	{
-		var identity = member.Slice(member.Depth);
-		var shared = member.Slice(1);
-		var buffer = nameBuffer.AsSpan();
-		identity.CopyTo(buffer);
-		buffer[identity.Length] = '_';
-		buffer = buffer[(identity.Length + 1)..];
-		shared.CopyTo(buffer);
-		nameLength = identity.Length + shared.Length + 1;
-
-		var value = member.Value;
-		prefix.CopyTo(0, valueBuffer, 0, prefix.Length);
-		buffer = valueBuffer.AsSpan(prefix.Length, value.Length);
-		value.CopyTo(buffer);
-		Replace(buffer, '\\', '/');
-		valueLength = prefix.Length + value.Length;
-
-		AppendInternal(builder, member);
+		for (var i = 0; i < buffer.Length; i++)
+		{
+			for (var j = 0; j < oldChars.Length; j++)
+			{
+				if (buffer[i] == oldChars[j])
+				{
+					buffer[i] = newChar;
+				}
+			}
+		}
 	}
 
 	private static void Replace(Span<char> buffer, char oldChar, char newChar)
