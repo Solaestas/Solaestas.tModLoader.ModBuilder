@@ -1,5 +1,4 @@
 using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Solaestas.tModLoader.ModBuilder.Generators;
 
 namespace TestProject;
@@ -35,11 +34,11 @@ public class UnitTest
 			"Mod/Items/D",
 		];
 
-		var builder = new PathBuilder();
 		var sb = new StringBuilder();
-		foreach(var path in paths)
+		var builder = new PathBuilder(sb, "Test", string.Empty);
+		foreach (var path in paths)
 		{
-			builder.Append(sb, path, string.Empty);
+			builder.Append(path);
 		}
 
 		Console.WriteLine(sb.ToString());
@@ -69,11 +68,11 @@ public class UnitTest
 		Assert.IsTrue(conflict.ContainsKey("C"));
 		Assert.AreEqual(3, conflict["C"].Count);
 
-		var builder = new PathBuilder();
 		var sb = new StringBuilder();
-		foreach(var path in paths)
+		var builder = new PathBuilder(sb, "Test", string.Empty);
+		foreach (var path in paths)
 		{
-			builder.Append(sb, path, string.Empty);
+			builder.Append(path);
 		}
 
 		Console.WriteLine(sb.ToString());
@@ -95,12 +94,25 @@ public class UnitTest
 		Assert.AreEqual("Y/A", paths[1].Name.ToString());
 		Assert.AreEqual("Z/A", paths[2].Name.ToString());
 
-		var builder = new PathBuilder();
 		var sb = new StringBuilder();
-		foreach(var path in paths)
+		var builder = new PathBuilder(sb, "Test", string.Empty);
+		foreach (var path in paths)
 		{
-			builder.Append(sb, path, string.Empty);
+			builder.Append(path);
 		}
+
+		Console.WriteLine(sb.ToString());
+	}
+
+	[TestMethod]
+	public void SoundTest()
+	{
+		PathMember path = "Mod/A.ogg";
+
+		var sb = new StringBuilder();
+		var builder = new PathBuilder(sb, "Test", string.Empty);
+
+		builder.Append(path);
 
 		Console.WriteLine(sb.ToString());
 	}

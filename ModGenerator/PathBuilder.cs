@@ -2,7 +2,7 @@ using System.Text;
 
 namespace Solaestas.tModLoader.ModBuilder.Generators;
 
-public class PathBuilder
+public class PathBuilder(StringBuilder builder, string mod, string prefix)
 {
 	private char[] nameBuffer = new char[64];
 
@@ -12,7 +12,7 @@ public class PathBuilder
 
 	private int valueLength = 0;
 
-	public void Append(StringBuilder builder, in PathMember member, string prefix)
+	public void Append(in PathMember member)
 	{
 		Span<char> buffer;
 		ReadOnlySpan<char> name;
@@ -51,7 +51,7 @@ public class PathBuilder
 		Replace(buffer, '\\', '/');
 		valueLength = prefix.Length + value.Length;
 
-		AppendInternal(builder, member);
+		AppendInternal(member);
 	}
 
 	private static void Replace(Span<char> buffer, Span<char> oldChars, char newChar)
@@ -79,11 +79,19 @@ public class PathBuilder
 		}
 	}
 
-	private void AppendInternal(StringBuilder builder, in PathMember member)
+	private void AppendInternal(in PathMember member)
 	{
 		builder.Append("\tpublic const string ")
 			.Append(nameBuffer, 0, nameLength)
 			.Append("_Path = \"")
+			.Append(valueBuffer, 0, valueLength)
+			.AppendLine("\";");
+
+		builder.Append("\tpublic const string ")
+			.Append(nameBuffer, 0, nameLength)
+			.Append("_Mod = \"")
+			.Append(mod)
+			.Append('/')
 			.Append(valueBuffer, 0, valueLength)
 			.AppendLine("\";");
 

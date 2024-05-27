@@ -130,14 +130,14 @@ public class BuildEffect : Task
 				outputCloseEvent.Task,
 				errorCloseEvent.Task);
 
-			if(await System.Threading.Tasks.Task.WhenAny(procTask, timeout) == timeout)
+			if (await System.Threading.Tasks.Task.WhenAny(procTask, timeout) == timeout)
 			{
 				proc.Kill();
 				Log.LogError(LogText.BuildEffectTimeout);
 				return false;
 			}
 
-			if(errorMessages.Length > 0)
+			if (errorMessages.Length > 0)
 			{
 				Log.LogError(errorMessages.ToString());
 				return false;

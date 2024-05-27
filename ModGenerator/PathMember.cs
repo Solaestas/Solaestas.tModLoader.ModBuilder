@@ -40,6 +40,7 @@ public unsafe struct PathMember
 			{
 				"png" => AssetType.Texture2D,
 				"xnb" => AssetType.Effect,
+				"ogg" or "wav" or "mp3" => AssetType.SoundEffect,
 				_ => AssetType.None,
 			};
 		}

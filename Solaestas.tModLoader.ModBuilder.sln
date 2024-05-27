@@ -22,7 +22,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestProject", "TestProject\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LocalTestMod", "LocalTestMod\LocalTestMod.csproj", "{6F1907E7-4728-47C8-A372-05B15C6EEA6A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModGenerator", "ModGenerator\ModGenerator.csproj", "{690BAD7A-4991-457D-836A-E0E0BB9C2C4D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModGenerator", "ModGenerator\ModGenerator.csproj", "{690BAD7A-4991-457D-836A-E0E0BB9C2C4D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,15 +41,12 @@ Global
 		{799D527D-37A7-4190-A4FA-9EFA14BB61A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{799D527D-37A7-4190-A4FA-9EFA14BB61A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{799D527D-37A7-4190-A4FA-9EFA14BB61A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{799D527D-37A7-4190-A4FA-9EFA14BB61A5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4B2BC328-8787-429C-99F0-428BD3D50F7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4B2BC328-8787-429C-99F0-428BD3D50F7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4B2BC328-8787-429C-99F0-428BD3D50F7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4B2BC328-8787-429C-99F0-428BD3D50F7B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6F1907E7-4728-47C8-A372-05B15C6EEA6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6F1907E7-4728-47C8-A372-05B15C6EEA6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F1907E7-4728-47C8-A372-05B15C6EEA6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6F1907E7-4728-47C8-A372-05B15C6EEA6A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{690BAD7A-4991-457D-836A-E0E0BB9C2C4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{690BAD7A-4991-457D-836A-E0E0BB9C2C4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{690BAD7A-4991-457D-836A-E0E0BB9C2C4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
